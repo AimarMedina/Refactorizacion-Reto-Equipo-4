@@ -6,7 +6,7 @@
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  padding: 0.5em 1em;
+  padding: 1em;
 }
 
 .sidebar-section {
@@ -16,12 +16,15 @@
 .sidebar-title {
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;
+  border-radius: $border-radius-sm;
+  transition: background-color .15s ease-in-out, color .15s ease-in-out;
   color: $headings-color;
-  padding: 4px 0;
-  cursor: pointer;
+  padding: 4px 12px;
+  color: #000000;
+  display: flex;
 
   &:hover {
-    background-color: $gray-100;
+    background-color: $gray-300;
   }
 
   &.active {
@@ -34,11 +37,11 @@
 .sidebar-item {
   font-size: $font-size-md;
   color: $body-color;
-  padding: 2px 12px;
-  cursor: pointer;
+  padding: 2px 24px;
   border-radius: $border-radius-sm;
   transition: background-color .15s ease-in-out, color .15s ease-in-out;
   margin-bottom: 4px;
+  display: flex;
 
   &:hover {
     background-color: $gray-300;
@@ -50,3 +53,8 @@
     font-weight: $font-weight-medium;
   }
 }
+
+.router-link-exact-active {
+  background-color: $gray-300;
+}
+

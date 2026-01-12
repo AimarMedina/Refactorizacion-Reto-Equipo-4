@@ -11886,7 +11886,7 @@ textarea.form-control-lg {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  padding: 0.5em 1em;
+  padding: 1em;
 }
 
 .sidebar-section {
@@ -11896,12 +11896,15 @@ textarea.form-control-lg {
 .sidebar-title {
   font-size: 1.25rem;
   font-weight: 600;
+  border-radius: 0.25rem;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
   color: inherit;
-  padding: 4px 0;
-  cursor: pointer;
+  padding: 4px 12px;
+  color: #000000;
+  display: flex;
 }
 .sidebar-title:hover {
-  background-color: #f8f9fa;
+  background-color: #dee2e6;
 }
 .sidebar-title.active {
   background-color: rgb(242.3, 229.6, 238.9);
@@ -11912,11 +11915,11 @@ textarea.form-control-lg {
 .sidebar-item {
   font-size: 1rem;
   color: #212529;
-  padding: 2px 12px;
-  cursor: pointer;
+  padding: 2px 24px;
   border-radius: 0.25rem;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
   margin-bottom: 4px;
+  display: flex;
 }
 .sidebar-item:hover {
   background-color: #dee2e6;
@@ -11925,6 +11928,10 @@ textarea.form-control-lg {
   background-color: rgb(242.3, 229.6, 238.9);
   color: #80015e;
   font-weight: 500;
+}
+
+.router-link-exact-active {
+  background-color: #dee2e6;
 }
 
 /*# sourceMappingURL=styles.css.map */
