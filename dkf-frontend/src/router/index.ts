@@ -204,12 +204,30 @@ const router = createRouter({
 router.beforeEach((to) => {
   const auth = useAuthStore();
 
+  // Si no está logueado y la ruta requiere auth → login
   if (to.meta.requiresAuth && !auth.token) {
     return { name: "login" };
   }
 
+  // Si ya está logueado y es ruta de invitado → redirige a dashboard
   if (to.meta.guest && auth.token) {
     return { name: "dashboard" };
+  }
+
+  // Redirección por defecto según rol cuando entramos a "/"
+  if (to.path === "/") {
+    switch (auth.currentUser?.role) {
+      case "alumno":
+        return { path: "/alumno/inicio" };
+      case "tutor_egibide":
+        return { path: "/tutor-egibide/inicio" };
+      case "tutor_empresa":
+        return { path: "/tutor-empresa/inicio" };
+      case "admin":
+        return { path: "/admin/inicio" };
+      default:
+        return { name: "login" }; // fallback
+    }
   }
 });
 
