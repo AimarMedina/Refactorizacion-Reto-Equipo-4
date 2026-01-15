@@ -1,26 +1,32 @@
 import type { Alumno } from "@/interfaces/Alumno";
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import { useAuthStore } from "./auth";
+import { defineStore } from 'pinia'
+import axios from 'axios'
 
-export const useAlumnosStore = defineStore('alumnos', () => {
-  const alumnos = ref<Alumno[]>([]);
-  const authStore = useAuthStore(); // Para el token si la API es protegida
+export const useAlumnosStore = defineStore('alumnos', {
+  state: () => ({
+    Alumno: null as Alumno | null,
+    loading: false,
+    error: null as string | null
+  }),
 
-  // Obtener todos las competencias
-  async function fetchAlumnos() {
-    const response = await fetch('http://localhost:8000/api/alumnos', {
-      headers: authStore.token ? {
-        'Authorization': `Bearer ${authStore.token}`,
-        'Accept': 'application/json',
-      } : {
-        'Accept': 'application/json',
-      },
-    });
+  actions: {
+    async fetchAlumno() {
+      console.log('fetchMiAlumno START')
+      this.loading = true
+      this.error = null
 
-    const data = await response.json();
-    alumnos.value = data as Alumno[];
+      try {
+        const res = await axios.get('http://localhost:8000/api/me/alumno')
+        console.log('STATUS', res.status)
+        console.log('DATA', res.data)
+        this.Alumno = res.data
+      } catch (e: any) {
+        console.log('ERROR', e?.response?.status, e?.response?.data)
+        this.Alumno = null
+        this.error = e?.response?.data?.message ?? 'Error al cargar alumno'
+      } finally {
+        this.loading = false
+      }
+    }
   }
-
-  return { alumnos, fetchAlumnos };
-});
+})

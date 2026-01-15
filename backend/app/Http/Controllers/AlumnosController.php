@@ -62,4 +62,26 @@ class AlumnosController extends Controller
     {
         //
     }
+
+    public function me()
+    {
+        $userId = auth()->id();
+
+        $alumno = Alumnos::select(
+                'nombre',
+                'apellidos',
+                'telefono',
+                'ciudad'
+            )
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$alumno) {
+            return response()->json([
+                'message' => 'Alumno no encontrado'
+            ], 404);
+        }
+
+        return response()->json($alumno);
+    }
 }
