@@ -23,6 +23,7 @@ onMounted(() => {
       <div class="card-body">
         <p><strong>Nombre:</strong> {{ alumnosStore.Alumno.nombre }}</p>
         <p><strong>Apellidos:</strong> {{ alumnosStore.Alumno.apellidos }}</p>
+        <p><strong>Correo electrónico:</strong> {{ alumnosStore.Alumno.email }}</p>
         <p><strong>Teléfono:</strong> {{ alumnosStore.Alumno.telefono}}</p>
         <p><strong>Ciudad:</strong> {{ alumnosStore.Alumno.ciudad }}</p>
       </div>

@@ -64,24 +64,25 @@ class AlumnosController extends Controller
     }
 
     public function me()
-    {
-        $userId = auth()->id();
+{
+    $userId = auth()->id();
 
-        $alumno = Alumnos::select(
-                'nombre',
-                'apellidos',
-                'telefono',
-                'ciudad'
-            )
-            ->where('user_id', $userId)
-            ->first();
+    $row = Alumnos::join('users', 'alumnos.user_id', '=', 'users.id')
+        ->select(
+            'alumnos.nombre',
+            'alumnos.apellidos',
+            'alumnos.telefono',
+            'alumnos.ciudad',
 
-        if (!$alumno) {
-            return response()->json([
-                'message' => 'Alumno no encontrado'
-            ], 404);
-        }
+            'users.email',
+        )
+        ->where('alumnos.user_id', $userId)
+        ->first();
 
-        return response()->json($alumno);
+    if (!$row) {
+        return response()->json(['message' => 'Alumno no encontrado'], 404);
     }
+
+    return response()->json($row);
+}
 }

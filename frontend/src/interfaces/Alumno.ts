@@ -3,5 +3,6 @@ export interface Alumno {
   nombre: string,
   apellidos: string,
   telefono: string,
+  email: string,
   ciudad:string
 }
