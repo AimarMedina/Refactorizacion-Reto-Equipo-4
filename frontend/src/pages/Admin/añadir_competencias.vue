@@ -1,16 +1,44 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { useCiclosStore } from "@/stores/ciclos";
+import { useCompetenciasStore } from "@/stores/competencias";
+import { useFamiliaProfesionalesStore } from "@/stores/familiasProfesionales";
+import { computed, onMounted, ref } from "vue";
+
+const familiaProfesionalStore = useFamiliaProfesionalesStore();
+const cicloStore = useCiclosStore();
+const competenciaStore = useCompetenciasStore();
 
 const tipoCompetencia = ref<string>("tecnica");
-const familiaProfesional = ref<string>("");
-const ciclo = ref<string>("");
+const familiaProfesional = ref<number>(0);
+const ciclo = ref<number>(0);
 const descripcion = ref<string>("");
+
+const ciclosFamilia = computed(() => {
+  if (!familiaProfesional.value) return [];
+  return cicloStore.getCiclosPorFamilia(familiaProfesional.value);
+});
+
+onMounted(async () => {
+  await familiaProfesionalStore.fetchFamiliasProfesionales();
+  await cicloStore.fetchCiclos();
+});
+
+function agregarCompetencia() {
+  if (tipoCompetencia.value === "tecnica") {
+    competenciaStore.createCompetenciaTecnica(ciclo.value, descripcion.value);
+  } else {
+    competenciaStore.createCompetenciaTransversal(
+      familiaProfesional.value,
+      descripcion.value,
+    );
+  }
+}
 </script>
 
 <template>
   <h2>NUEVA COMPETENCIA</h2>
   <hr />
-  <form @submit.prevent="" class="row-cols-1">
+  <form @submit.prevent="agregarCompetencia" class="row-cols-1">
     <div class="mb-3">
       <!-- Tipo de competencia -->
       <p>Tipo de competencia</p>
@@ -23,7 +51,7 @@ const descripcion = ref<string>("");
           value="tecnica"
           v-model="tipoCompetencia"
         />
-        <label class="form-check-label" for="tecnica"> Técnica </label>
+        <label class="form-check-label" for="tecnica">Técnica</label>
       </div>
       <div class="form-check form-check-inline">
         <input
@@ -34,7 +62,7 @@ const descripcion = ref<string>("");
           value="transversal"
           v-model="tipoCompetencia"
         />
-        <label class="form-check-label" for="transversal"> Transversal </label>
+        <label class="form-check-label" for="transversal">Transversal</label>
       </div>
     </div>
 
@@ -45,14 +73,18 @@ const descripcion = ref<string>("");
       >
       <select
         class="form-select"
-        aria-label="Familia profesional"
-        v-model="familiaProfesional"
-        id="familiaProfesional"
+        v-model.number="familiaProfesional"
+        id="familia"
+        required
       >
-        <option value="" disabled>-- Selecciona una opción --</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
+        <option :value="0" disabled>-- Selecciona una opción --</option>
+        <option
+          v-for="familia in familiaProfesionalStore.familiasProfesionales"
+          :key="familia.id_familia"
+          :value="familia.id_familia"
+        >
+          {{ familia.nombre }}
+        </option>
       </select>
     </div>
 
@@ -71,13 +103,18 @@ const descripcion = ref<string>("");
       </div>
     </div>
 
+    <!-- Si la competencia a agregar es tecnica se cargan los ciclos de de la familia profesional seleccionada -->
     <div v-if="tipoCompetencia === 'tecnica'" class="mb-3 col-5">
       <label for="ciclo" class="form-label">Ciclo:</label>
-      <select class="form-select" aria-label="Ciclo" v-model="ciclo" id="ciclo">
-        <option value="" disabled>-- Selecciona una opción --</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
+      <select class="form-select" v-model.number="ciclo" id="ciclo" required>
+        <option :value="0" disabled>-- Selecciona una opción --</option>
+        <option
+          v-for="ciclo in ciclosFamilia"
+          :key="ciclo.id"
+          :value="ciclo.id"
+        >
+          {{ ciclo.nombre }}
+        </option>
       </select>
     </div>
     <button type="submit" class="btn btn-primary col-2">Agregar</button>
