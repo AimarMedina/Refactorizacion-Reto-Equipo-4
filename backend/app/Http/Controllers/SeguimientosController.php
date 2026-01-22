@@ -78,6 +78,31 @@ class SeguimientosController extends Controller
 
     public function nuevoSeguimiento(Request $request)
     {
+        $request->validate([
+            'alumno_id' => 'required|integer|exists:alumnos,id',
+            'fecha' => 'required|date',
+            'accion' => 'required|string|max:150',
+            'descripcion' => 'nullable|string',
+            'via' => 'nullable|string|max:50'
+        ]);
 
+        // Buscar la estancia del alumno
+        $estancia = \App\Models\Estancia::where('alumno_id', $request->alumno_id)->first();
+
+        if (!$estancia) {
+            return response()->json(['message' => 'Estancia del alumno no encontrada'], 404);
+        }
+
+        // Crear seguimiento
+        $seguimiento = \App\Models\Seguimiento::create([
+            'accion' => $request->accion,
+            'fecha' => $request->fecha,
+            'descripcion' => $request->descripcion,
+            'via' => $request->via,
+            'estancia_id' => $estancia->id,
+        ]);
+
+        return response()->json(['message' => 'Seguimiento creado', 'seguimiento' => $seguimiento]);
     }
+
 }

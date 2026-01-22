@@ -31,9 +31,44 @@ export const useSeguimientosStore = defineStore("seguimientos", () => {
   }
 
   // Crear un nuevo seguimiento
-  async function nuevoSeguimiento() {
-    
+  async function nuevoSeguimiento(payload: {
+  alumno_id: number;
+  fecha: string | null;
+  accion: string;
+  descripcion?: string;
+  via?: string;
+}) {
+  if (!payload.fecha) throw new Error("La fecha es obligatoria");
+
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const res = await fetch("http://localhost:8000/api/nuevo-seguimiento", {
+      method: "POST",
+      headers: authStore.token
+        ? { "Content-Type": "application/json", Authorization: `Bearer ${authStore.token}` }
+        : { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.message || `Error ${res.status}`);
+    }
+
+    const data = await res.json();
+    // Añadir el seguimiento creado al array local
+    seguimientos.value.unshift(data.seguimiento);
+    return data.seguimiento;
+  } catch (err: any) {
+    error.value = err.message;
+    throw err;
+  } finally {
+    loading.value = false;
   }
+}
+
 
   return { seguimientos, loading, error, fetchSeguimientos, nuevoSeguimiento };
 });
