@@ -49,8 +49,39 @@ onMounted(async () => {
 
 // Función para guardar seguimiento
 async function guardarSeguimiento() {
-  
+  if (!alumno.value) return;
+  if (!fecha.value) {
+    //seguimientosStore.message.value = "Debes seleccionar una fecha";
+    //seguimientosStore.messageType.value = "danger";
+    return;
+  }
+
+  submitting.value = true;
+
+  try {
+    const payload = {
+      alumno_id: alumno.value.id,
+      fecha: fecha.value, // ya no es null
+      accion: accion.value,
+      descripcion: descripcion.value || "",
+      via: "General",
+    };
+
+    await seguimientosStore.nuevoSeguimiento(payload);
+
+    //seguimientosStore.message.value = "Seguimiento creado correctamente";
+    //seguimientosStore.messageType.value = "success";
+
+    router.back();
+  } catch (error: any) {
+    console.error(error);
+    //seguimientosStore.message.value = "Error al crear seguimiento: " + error.message;
+    //seguimientosStore.messageType.value = "danger";
+  } finally {
+    submitting.value = false;
+  }
 }
+
 
 // Funciones de navegación
 const volver = () => router.back();
