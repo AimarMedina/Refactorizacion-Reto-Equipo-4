@@ -7,14 +7,6 @@ use Illuminate\Http\UploadedFile;
 use Exception;
 
 class CicloImportService {
-  /**
-   * Importa datos del ciclo desde un archivo CSV
-   *
-   * @param int $cicloId
-   * @param UploadedFile $file
-   * @return array
-   * @throws Exception
-   */
   public function importarDesdeCSV(int $cicloId, UploadedFile $file): array {
     // Verificar que el ciclo existe
     $ciclo = DB::table('ciclos')->where('id', $cicloId)->first();

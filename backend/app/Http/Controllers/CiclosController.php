@@ -98,6 +98,6 @@ class CiclosController extends Controller {
 
         return response($csvContent, 200)
             ->header('Content-Type', 'text/csv; charset=utf-8')
-            ->header('Content-Disposition', 'attachment; filename="plantilla_importacion_ciclo.csv"');
+            ->header('Content-Disposition', 'attachment; filename="plantilla_ciclo.csv"');
     }
 }

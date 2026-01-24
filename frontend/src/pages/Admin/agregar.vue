@@ -27,7 +27,6 @@ import UploadCiclosCSV from "@/components/Ciclos/UploadCiclosCSV.vue";
       <p>Agregar un nuevo alumno</p>
     </RouterLink>
   </div>
-  <UploadCiclosCSV />
 </template>
 
 <style scoped>
