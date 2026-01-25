@@ -14,6 +14,10 @@ export const useAlumnosStore = defineStore("alumnos", () => {
   const inicio = ref<any | null>(null);
   const loadingInicio = ref(false);
 
+  const alumnoDetalle = ref<Alumno | null>(null);
+  const loadingAlumnoDetalle = ref(false);
+  const errorAlumnoDetalle = ref<string | null>(null);
+
   const authStore = useAuthStore();
 
   const message = ref<string | null>(null);
@@ -80,6 +84,43 @@ export const useAlumnosStore = defineStore("alumnos", () => {
     const data = await response.json();
     alumnos.value = data as Alumno[];
   }
+
+  async function fetchAlumnoDetalleAdmin(alumnoId: number) {
+  loadingAlumnoDetalle.value = true;
+  errorAlumnoDetalle.value = null;
+
+  try {
+    const response = await fetch(
+      `http://localhost:8000/api/admin/alumnos/${alumnoId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: authStore.token ? `Bearer ${authStore.token}` : "",
+          Accept: "application/json",
+        },
+      },
+    );
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      alumnoDetalle.value = null;
+      errorAlumnoDetalle.value =
+        data?.message || "Error al cargar el detalle del alumno";
+      return null;
+    }
+
+    alumnoDetalle.value = data as Alumno;
+    return alumnoDetalle.value;
+  } catch (e) {
+    console.error(e);
+    alumnoDetalle.value = null;
+    errorAlumnoDetalle.value = "No se pudo conectar con el servidor";
+    return null;
+  } finally {
+    loadingAlumnoDetalle.value = false;
+  }
+}
 
   async function eliminarEntrega(id: number) {
     try {
@@ -363,6 +404,10 @@ export const useAlumnosStore = defineStore("alumnos", () => {
     inicio,
     loadingInicio,
     notasEgibide,
+    alumnoDetalle,
+    loadingAlumnoDetalle,
+    errorAlumnoDetalle,
+    fetchAlumnoDetalleAdmin,
     eliminarEntrega,
     fetchInicio,
     subirEntrega,

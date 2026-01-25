@@ -328,7 +328,7 @@ const router = createRouter({
           path: "admin/alumnos/:alumnoId",
           name: "admin-detalle_alumno",
           components: {
-            main: () => import("@/pages/Alumno/detallesAlumno.vue"),
+            main: () => import("@/pages/Admin/detallesAlumno.vue"),
           },
           meta: { role: "admin" },
         },

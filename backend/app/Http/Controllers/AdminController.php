@@ -56,9 +56,13 @@ class AdminController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
+    public function alumnos($id)
+{
+        $alumno = \App\Models\Alumnos::with([
+            'estancias.empresa'
+        ])->findOrFail($id);
+
+        return response()->json($alumno);
     }
 
     /**

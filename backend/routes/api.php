@@ -95,5 +95,6 @@ Route::middleware('auth:sanctum')->group(
         //Admin
         Route::get('/admin/inicio', [AdminController::class, 'inicioAdmin']);
         Route::get('admin/ciclos/{ciclo}', [CiclosController::class, 'show']);
+        Route::get('admin/alumnos/{id}', [AdminController::class, 'alumnos']);
     }
 );
