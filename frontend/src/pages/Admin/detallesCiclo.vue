@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Ciclo } from "@/interfaces/Ciclo";
+import type { Asignatura } from "@/interfaces/Asignatura";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useFamiliaProfesionalesStore } from "@/stores/familiasProfesionales";
@@ -14,7 +15,9 @@ const familiasStore = useFamiliaProfesionalesStore();
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const ciclo = ref<Ciclo | null>(null);
+const asignaturas = ref<Asignatura[]>([]);
 const isLoading = ref(true);
+const isLoadingAsignaturas = ref(false);
 const error = ref<string | null>(null);
 
 // Obtener parámetro de la ruta
@@ -35,15 +38,12 @@ const cargarDetalleCiclo = async () => {
 
   try {
     // Cargar detalle del ciclo
-    const response = await fetch(
-      `${baseURL}/api/admin/ciclos/${cicloId}`,
-      {
-        headers: {
-          Authorization: authStore.token ? `Bearer ${authStore.token}` : "",
-          Accept: "application/json",
-        },
+    const response = await fetch(`${baseURL}/api/admin/ciclos/${cicloId}`, {
+      headers: {
+        Authorization: authStore.token ? `Bearer ${authStore.token}` : "",
+        Accept: "application/json",
       },
-    );
+    });
 
     if (!response.ok) throw new Error("Error al cargar los datos del ciclo");
     ciclo.value = await response.json();
@@ -52,11 +52,40 @@ const cargarDetalleCiclo = async () => {
     if (familiasStore.familiasProfesionales.length === 0) {
       await familiasStore.fetchFamiliasProfesionales();
     }
+
+    // Cargar asignaturas del ciclo
+    await cargarAsignaturas();
   } catch (err) {
     console.error(err);
     error.value = "No se pudo cargar la información del ciclo";
   } finally {
     isLoading.value = false;
+  }
+};
+
+const cargarAsignaturas = async () => {
+  isLoadingAsignaturas.value = true;
+
+  try {
+    const response = await fetch(
+      `${baseURL}/api/ciclo/${cicloId}/asignaturas`,
+      {
+        headers: {
+          Authorization: authStore.token ? `Bearer ${authStore.token}` : "",
+          Accept: "application/json",
+        },
+      },
+    );
+
+    if (!response.ok) throw new Error("Error al cargar las asignaturas");
+
+    const data = await response.json();
+    asignaturas.value = data.asignaturas || [];
+  } catch (err) {
+    console.error(err);
+    // No mostramos error crítico, solo log
+  } finally {
+    isLoadingAsignaturas.value = false;
   }
 };
 
@@ -140,6 +169,47 @@ const volver = () => router.back();
           </div>
         </div>
       </div>
+
+      <!-- Asignaturas del ciclo -->
+      <div class="card shadow-sm ">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-book me-2"></i>
+            Asignaturas del Ciclo
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Loading asignaturas -->
+          <div v-if="isLoadingAsignaturas" class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+            <span class="ms-2 text-muted">Cargando asignaturas...</span>
+          </div>
+
+          <!-- Sin asignaturas -->
+          <div v-else-if="asignaturas.length === 0" class="alert alert-info mb-0">
+            <i class="bi bi-info-circle me-2"></i>
+            No hay asignaturas registradas para este ciclo
+          </div>
+
+          <!-- Lista de asignaturas -->
+          <div v-else class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nombre de la Asignatura</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="asignatura in asignaturas" :key="asignatura.id">
+                  <td class="fw-semibold">{{ asignatura.codigo_asignatura }}</td>
+                  <td>{{ asignatura.nombre_asignatura }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -169,16 +239,32 @@ const volver = () => router.back();
 
 /* Card con texto reducido */
 .card-small-text {
-  font-size: 0.85rem; /* letra más pequeña para toda la carta */
+  font-size: 0.85rem;
 }
 
 .card-small-text h3 {
-  font-size: 1.1rem; /* ligeramente más grande que el resto */
+  font-size: 1.1rem;
   margin-bottom: 0.25rem;
 }
 
 .card-small-text p {
-  font-size: 0.8rem; /* más pequeño para subtítulos */
+  font-size: 0.8rem;
   margin-bottom: 0;
+}
+
+/* Estilos para la tabla de asignaturas */
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.table td {
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa;
 }
 </style>

@@ -7,6 +7,8 @@ const competenciasStore = useCompetenciasStore();
 
 const isLoading = ref(true);
 const searchQuery = ref("");
+const showTecnicas = ref(true);
+const showTransversales = ref(true);
 
 // Fetch competencias al montar
 onMounted(async () => {
@@ -41,6 +43,14 @@ const competenciasTecnicas = computed(() =>
 const competenciasTransversales = computed(() =>
   competenciasFiltradas.value.filter(c => c.tipo === "TRANSVERSAL")
 );
+
+const toggleTecnicas = () => {
+  showTecnicas.value = !showTecnicas.value;
+};
+
+const toggleTransversales = () => {
+  showTransversales.value = !showTransversales.value;
+};
 </script>
 
 <template>
@@ -90,44 +100,88 @@ const competenciasTransversales = computed(() =>
       <div>No se encontraron competencias que coincidan con "{{ searchQuery }}"</div>
     </div>
 
-    <!-- Listado estático -->
-    <div v-else class="list-group list-group-flush">
+    <!-- Listado con desplegables -->
+    <div v-else>
       <!-- Técnicas -->
-      <h3 class="mt-3">Competencias Técnicas</h3>
-      <div
-        v-for="c in competenciasTecnicas"
-        :key="c.id"
-        class="list-group-item d-flex align-items-center py-3 mb-2"
-      >
-        <div class="avatar-circle bg-tecnica me-3">
-          <i class="bi bi-tools"></i>
+      <div v-if="competenciasTecnicas.length > 0" class="mb-4">
+        <div
+          class="section-header d-flex align-items-center py-2 cursor-pointer"
+          @click="toggleTecnicas"
+        >
+          <div class="avatar-circle bg-tecnica me-3">
+            <i class="bi bi-tools"></i>
+          </div>
+          <h3 class="mb-0 flex-grow-1">Competencias Técnicas</h3>
+          <span class="badge bg-tecnica rounded-pill me-3">
+            {{ competenciasTecnicas.length }}
+          </span>
+          <i
+            class="bi fs-4 transition-icon"
+            :class="showTecnicas ? 'bi-chevron-up' : 'bi-chevron-down'"
+          ></i>
         </div>
-        <div>
-          <span>{{ c.descripcion }}</span>
+
+        <div class="collapse" :class="{ show: showTecnicas }">
+          <div class="list-group list-group-flush mt-2">
+            <div
+              v-for="c in competenciasTecnicas"
+              :key="c.id"
+              class="list-group-item d-flex align-items-center py-3 mb-2"
+            >
+              <div class="avatar-circle-small bg-tecnica me-3">
+                <i class="bi bi-gear-fill"></i>
+              </div>
+              <div>
+                <span>{{ c.descripcion }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Transversales -->
-      <h3 class="mt-4">Competencias Transversales</h3>
-      <div
-        v-for="c in competenciasTransversales"
-        :key="c.id"
-        class="list-group-item d-flex align-items-center py-3 mb-2"
-      >
-        <div class="avatar-circle bg-transversal me-3">
-          <i class="bi bi-people-fill"></i>
+      <div v-if="competenciasTransversales.length > 0">
+        <div
+          class="section-header d-flex align-items-center py-2 cursor-pointer"
+          @click="toggleTransversales"
+        >
+          <div class="avatar-circle bg-transversal me-3">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <h3 class="mb-0 flex-grow-1">Competencias Transversales</h3>
+          <span class="badge bg-transversal rounded-pill me-3">
+            {{ competenciasTransversales.length }}
+          </span>
+          <i
+            class="bi fs-4 transition-icon"
+            :class="showTransversales ? 'bi-chevron-up' : 'bi-chevron-down'"
+          ></i>
         </div>
-        <div>
-          <span>{{ c.descripcion }}</span>
+
+        <div class="collapse" :class="{ show: showTransversales }">
+          <div class="list-group list-group-flush mt-2">
+            <div
+              v-for="c in competenciasTransversales"
+              :key="c.id"
+              class="list-group-item d-flex align-items-center py-3 mb-2"
+            >
+              <div class="avatar-circle-small bg-transversal me-3">
+                <i class="bi bi-star-fill"></i>
+              </div>
+              <div>
+                <span>{{ c.descripcion }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Contador -->
-    <div v-if="!isLoading && competenciasStore.competencias.length > 0" class="mt-3">
-      <small class="text-muted">
-        Mostrando {{ competenciasFiltradas.length }} de {{ competenciasStore.competencias.length }} competencia(s)
-      </small>
+      <!-- Contador -->
+      <div class="mt-3">
+        <small class="text-muted">
+          Mostrando {{ competenciasFiltradas.length }} de {{ competenciasStore.competencias.length }} competencia(s)
+        </small>
+      </div>
     </div>
   </div>
 </template>
@@ -142,14 +196,26 @@ const competenciasTransversales = computed(() =>
 }
 
 .avatar-circle {
-  width: 45px;
-  height: 45px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.avatar-circle-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1rem;
   flex-shrink: 0;
 }
 
@@ -161,6 +227,7 @@ const competenciasTransversales = computed(() =>
     #07dbb1 100%
   );
 }
+
 .bg-transversal {
   background: linear-gradient(
     135deg,
@@ -175,5 +242,26 @@ h2 {
 
 h3 {
   margin-bottom: 0.5rem;
+}
+
+.section-header {
+  cursor: pointer;
+  user-select: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.section-header:hover {
+  background-color: #f8f9fa;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.transition-icon {
+  transition: transform 0.3s ease;
+  color: #6c757d;
 }
 </style>

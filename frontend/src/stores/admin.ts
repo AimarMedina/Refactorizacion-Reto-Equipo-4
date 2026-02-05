@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
-const baseURL = import.meta.env.VITE_baseURL_URL;
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 // ---- Tipos ----
 export interface Empresa {
@@ -92,13 +92,13 @@ export const useAdminStore = defineStore("admin", () => {
     errorInicio.value = null;
 
     try {
-      const response = await fetch(`${baseURL}/admin/inicio`, {
+      const response = await fetch(`${baseURL}/api/admin/inicio`, {
         method: "GET",
         headers: authHeaders(),
       });
 
       const data = await parseJsonSafe(response);
-
+      console.log(baseURL)
       if (!response.ok) {
         inicio.value = null;
         errorInicio.value = String(buildErrorMessage(data, response));

@@ -1,10 +1,7 @@
-import DetallesAlumno from "@/pages/Alumno/detallesAlumno.vue";
-import detallesEmpresa from "@/pages/TutorEgibide/detallesEmpresa.vue";
 import LoginView from "@/pages/Authentication/LoginView.vue";
 import DashboardView from "@/pages/DashboardView.vue";
 import { useAuthStore } from "@/stores/auth";
 import { createRouter, createWebHistory } from "vue-router";
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -189,6 +186,14 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
+          path:"tutor_empresa/crear-estancia",
+          name:"tutor_empresa-crear-estancia",
+          components:{
+            main: ()=> import("@/pages/TutorEgibide/estancia.vue"),
+          },
+          meta: {role: "tutor_egibide"},
+        },
+        {
           path: "tutor-empresa/inicio",
           name: "tutor_empresa-inicio",
           components: {
@@ -348,6 +353,7 @@ const router = createRouter({
           },
           meta: { role: "admin" },
         },
+
       ],
     },
   ],

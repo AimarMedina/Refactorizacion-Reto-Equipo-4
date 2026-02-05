@@ -14,6 +14,7 @@ use App\Http\Controllers\TutorEmpresaController;
 use App\Http\Controllers\SeguimientosController;
 use App\Http\Controllers\EntregaController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EstanciaController;
 
 Route::post('/login', [AuthController::class, 'authenticate'])->name('authenticate');
 Route::get('/entregas/{entrega}/archivo', [EntregaController::class, 'archivo']);
@@ -34,6 +35,7 @@ Route::middleware('auth:sanctum')->group(
         Route::get('/ciclos/plantilla', [CiclosController::class, 'descargarPlantillaCSV']);
         Route::get('/ciclo/{ciclo_id}/cursos', [CiclosController::class, 'getCursosByCiclos']);
         Route::get('/ciclo/{ciclo_id}/tutores', [TutorEgibideController::class, 'getTutoresByCiclo']);
+        Route::get('/ciclo/{ciclo_id}/asignaturas', [CiclosController::class, 'getAsignaturasByCiclo']);
 
         // Competencias
         Route::get('/competencias', [CompetenciasController::class, 'index']);
@@ -99,5 +101,15 @@ Route::middleware('auth:sanctum')->group(
         Route::get('admin/ciclos/{ciclo}', [CiclosController::class, 'show']);
         Route::get('admin/alumnos/{id}', [AdminController::class, 'detalleAlumno']);
         Route::get('/admin/empresas/{empresaId}', [AdminController::class, 'detalleEmpresa']);
+
+        //Estancia
+        Route::get('/estancias', [EstanciaController::class, 'index']);
+        Route::post('/estancias', [EstanciaController::class, 'store']);
+        Route::get('/estancias/{id}', [EstanciaController::class, 'show']);
+        Route::put('/estancias/{id}', [EstanciaController::class, 'update']);
+        Route::delete('/estancias/{id}', [EstanciaController::class, 'destroy']);
+        Route::get('/alumnos/{alumno_id}/estancias', [EstanciaController::class, 'getEstanciasByAlumno']);
+
     }
+
 );

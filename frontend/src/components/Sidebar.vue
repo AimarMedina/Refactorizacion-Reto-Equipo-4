@@ -86,6 +86,11 @@ const userId = computed(() => authStore.currentUser.id);
               >Empresas</RouterLink
             >
           </li>
+          <li>
+            <RouterLink to="/tutor-egibide/crear-estancia" class="sidebar-item"
+              >Estancia</RouterLink
+            >
+          </li>
         </ul>
       </div>
     </nav>

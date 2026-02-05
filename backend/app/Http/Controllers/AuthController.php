@@ -7,25 +7,29 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
-class AuthController extends Controller {
+class AuthController extends Controller
+{
     /**
      * Display login view.
      */
-    public function login() {
+    public function login()
+    {
         return view('auth/login');
     }
 
     /**
      * Display register view.
      */
-    public function register() {
+    public function register()
+    {
         return view('auth/register');
     }
 
     /**
      * Authenticate user.
      */
-    public function authenticate(Request $request): JsonResponse {
+    public function authenticate(Request $request): JsonResponse
+    {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required']
@@ -47,7 +51,8 @@ class AuthController extends Controller {
         ]);
     }
 
-    public function logout(): RedirectResponse {
+    public function logout(): RedirectResponse
+    {
         Auth::logout();
         return redirect()->intended('');
     }

@@ -22,7 +22,6 @@ export const useAuthStore = defineStore("auth", () => {
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         error.value = data.message || "Error desconocido, intentalo más tarde";
         setTimeout(() => {

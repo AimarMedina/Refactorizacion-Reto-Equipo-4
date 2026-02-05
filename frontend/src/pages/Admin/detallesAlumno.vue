@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useAlumnosStore } from "@/stores/alumnos";
+import ModalEditarEstancia from "@/components/Estancias/ModalEditarEstancia.vue";
 import type { Alumno } from "@/interfaces/Alumno";
 import type { Estancia } from "@/interfaces/Estancia";
+import { useAlumnosStore } from "@/stores/alumnos";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -13,6 +14,9 @@ const alumnoId = Number(route.params.alumnoId);
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);
+const estanciaSeleccionada = ref<Estancia | null>(null);
+const showModalEditar = ref(false);
+const isDeleting = ref(false);
 
 const alumno = computed<Alumno | null>(() => alumnosStore.alumnoDetalle);
 
@@ -20,7 +24,6 @@ const estanciaActual = computed<Estancia | null>(() => {
   const estancias = alumno.value?.estancias ?? [];
   if (estancias.length === 0) return null;
 
-  // Elegimos la "más reciente" por fecha_inicio (si existe)
   const ordenadas = [...estancias].sort((a, b) => {
     const da = a.fecha_inicio ? new Date(a.fecha_inicio).getTime() : 0;
     const db = b.fecha_inicio ? new Date(b.fecha_inicio).getTime() : 0;
@@ -40,6 +43,68 @@ const formatDate = (dateString: string) => {
 };
 
 const volver = () => router.back();
+
+const abrirModalEditar = () => {
+  if (estanciaActual.value) {
+    estanciaSeleccionada.value = estanciaActual.value;
+    showModalEditar.value = true;
+  }
+};
+
+const cerrarModalEditar = () => {
+  showModalEditar.value = false;
+  estanciaSeleccionada.value = null;
+};
+
+const confirmarEliminar = async () => {
+  if (!estanciaActual.value) return;
+
+  const confirmar = confirm(
+    "¿Estás seguro de que deseas eliminar esta estancia? Esta acción no se puede deshacer."
+  );
+
+  if (!confirmar) return;
+
+  await eliminarEstancia();
+};
+
+const eliminarEstancia = async () => {
+  if (!estanciaActual.value) return;
+
+  isDeleting.value = true;
+  try {
+    const baseURL = import.meta.env.VITE_API_BASE_URL;
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      `${baseURL}/api/estancias/${estanciaActual.value.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) throw new Error("Error al eliminar la estancia");
+
+    // Recargar datos del alumno
+    await alumnosStore.fetchAlumnoDetalleAdmin(alumnoId);
+
+    alert("Estancia eliminada exitosamente");
+  } catch (e) {
+    console.error(e);
+    alert("Error al eliminar la estancia");
+  } finally {
+    isDeleting.value = false;
+  }
+};
+
+const handleEstanciaActualizada = async () => {
+  cerrarModalEditar();
+  await alumnosStore.fetchAlumnoDetalleAdmin(alumnoId);
+};
 
 onMounted(async () => {
   try {
@@ -69,18 +134,16 @@ onMounted(async () => {
   <div class="container mt-4">
     <!-- Loading -->
     <div v-if="isLoading" class="text-center py-5">
-      <div class="spinner-border" style="color: #81045f;" role="status">
+      <div class="spinner-border" style="color: #81045f" role="status">
         <span class="visually-hidden">Cargando...</span>
       </div>
-      <p class="mt-3 text-muted fw-semibold">Cargando información del alumno...</p>
+      <p class="mt-3 text-muted fw-semibold">
+        Cargando información del alumno...
+      </p>
     </div>
 
     <!-- Error -->
-    <div
-      v-else-if="error"
-      class="alert alert-danger d-flex align-items-center"
-      role="alert"
-    >
+    <div v-else-if="error" class="alert alert-danger d-flex align-items-center" role="alert">
       <i class="bi bi-exclamation-triangle-fill me-2"></i>
       <div>
         {{ error }}
@@ -118,7 +181,7 @@ onMounted(async () => {
         </ol>
       </nav>
 
-      <!-- Card igual que la imagen -->
+      <!-- Card del alumno -->
       <div class="card mb-4 shadow-sm">
         <div class="card-body">
           <div class="d-flex align-items-center mb-3">
@@ -171,31 +234,52 @@ onMounted(async () => {
               </div>
             </div>
 
-            <div
-              class="col-md-6"
-              v-if="estanciaActual?.fecha_inicio || estanciaActual?.fecha_fin"
-            >
+            <div class="col-md-6" v-if="estanciaActual?.fecha_inicio || estanciaActual?.fecha_fin">
               <div class="info-item">
                 <i class="bi bi-calendar-range-fill text-primary me-2"></i>
                 <span class="text-muted">Periodo:</span>
                 <strong class="ms-2">
-                  {{ estanciaActual?.fecha_inicio ? formatDate(estanciaActual.fecha_inicio) : "Por definir" }}
+                  {{
+                    estanciaActual?.fecha_inicio
+                      ? formatDate(estanciaActual.fecha_inicio)
+                      : "Por definir"
+                  }}
                   -
-                  {{ estanciaActual?.fecha_fin ? formatDate(estanciaActual.fecha_fin) : "Por definir" }}
+                  {{
+                    estanciaActual?.fecha_fin
+                      ? formatDate(estanciaActual.fecha_fin)
+                      : "Por definir"
+                  }}
                 </strong>
               </div>
             </div>
+          </div>
 
-            <!-- Si no tiene estancias -->
-            <div class="col-12" v-if="!estanciaActual">
-              <div class="alert alert-info mb-0">
-                Este alumno todavía no tiene una estancia asignada.
-              </div>
+          <!-- Botones de acción -->
+          <div class="mt-4 d-flex gap-2" v-if="estanciaActual">
+            <button class="btn btn-primary" @click="abrirModalEditar">
+              <i class="bi bi-pencil-fill me-2"></i>
+              Editar Estancia
+            </button>
+            <button class="btn btn-danger" @click="confirmarEliminar" :disabled="isDeleting">
+              <i class="bi bi-trash-fill me-2"></i>
+              {{ isDeleting ? "Eliminando..." : "Eliminar Estancia" }}
+            </button>
+          </div>
+
+          <!-- Si no tiene estancias -->
+          <div class="mt-3" v-if="!estanciaActual">
+            <div class="alert alert-info mb-0">
+              Este alumno todavía no tiene una estancia asignada.
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Modal -->
+    <ModalEditarEstancia v-if="showModalEditar && estanciaSeleccionada" :estancia="estanciaSeleccionada"
+      :alumno-id="alumnoId" @close="cerrarModalEditar" @estancia-actualizada="handleEstanciaActualizada" />
   </div>
 </template>
 
@@ -216,6 +300,7 @@ onMounted(async () => {
 .breadcrumb-item a {
   color: var(--bs-primary);
 }
+
 .breadcrumb-item a:hover {
   color: var(--bs-primary);
   text-decoration: underline !important;

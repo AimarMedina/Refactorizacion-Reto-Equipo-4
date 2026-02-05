@@ -17,9 +17,11 @@ class AdminController extends Controller
     {
         $user = $request->user();
 
+
         // (Opcional pero recomendado) asegurar rol admin
         if (($user->role ?? null) !== 'admin') {
             return response()->json([
+                'user' => $user,
                 'message' => 'No autorizado.'
             ], 403);
         }

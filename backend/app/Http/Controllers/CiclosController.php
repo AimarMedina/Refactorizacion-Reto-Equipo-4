@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ciclos;
 use App\Models\Curso;
+use App\Models\Asignatura;
 use Illuminate\Http\Request;
 use App\Services\CicloImportService;
 use Illuminate\Support\Facades\Validator;
@@ -51,6 +52,34 @@ class CiclosController extends Controller {
             'familia_profesional_id' => $ciclo->familia_profesional_id,
             'familia_profesional' => $ciclo->familiaProfesional ? $ciclo->familiaProfesional->nombre : null,
         ]);
+    }
+    public function getAsignaturasByCiclo($idCiclo) {
+    // Buscar el ciclo
+    $ciclo = Ciclos::find($idCiclo);
+
+    if (!$ciclo) {
+        return response()->json(['message' => 'Ciclo no encontrado'], 404);
+    }
+
+    // Obtener todas las asignaturas del ciclo
+    $asignaturas = $ciclo->asignaturas;
+
+    // Retornar la información del ciclo junto con sus asignaturas
+    return response()->json([
+        'ciclo' => [
+            'id' => $ciclo->id,
+            'nombre' => $ciclo->nombre,
+            'familia_profesional_id' => $ciclo->familia_profesional_id,
+            'familia_profesional' => $ciclo->familiaProfesional ? $ciclo->familiaProfesional->nombre : null,
+        ],
+        'asignaturas' => $asignaturas->map(function($asignatura) {
+            return [
+                'id' => $asignatura->id,
+                'codigo_asignatura' => $asignatura->codigo_asignatura,
+                'nombre_asignatura' => $asignatura->nombre_asignatura,
+            ];
+        })
+    ]);
     }
 
     public function getCursosByCiclos($ciclo_id) {
