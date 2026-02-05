@@ -19,6 +19,13 @@
       <h4>Empresas</h4>
       <p>Ver empresas colaboradoras</p>
     </RouterLink>
+    <RouterLink
+      to="/tutor-egibide/grados"
+      class="info-card"
+    >
+      <h4>Mis Grados</h4>
+      <p>Ver grados en los que doy clase</p>
+    </RouterLink>
   </div>
 </template>
 

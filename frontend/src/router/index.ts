@@ -82,6 +82,14 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
+          path: "tutor-egibide/grados",
+          name: "tutor_egibide-grados",
+          components: {
+            main: () => import("@/pages/TutorEgibide/misGrados.vue"),
+          },
+          meta: { role: "tutor_egibide" },
+        },
+        {
           path: "tutor-egibide/alumnos",
           name: "tutor_egibide-alumnos",
           components: {
@@ -186,8 +194,8 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path:"tutor_empresa/crear-estancia",
-          name:"tutor_empresa-crear-estancia",
+          path:"tutor-egibide/crear-estancia",
+          name:"tutor_egibide-crear-estancia",
           components:{
             main: ()=> import("@/pages/TutorEgibide/estancia.vue"),
           },

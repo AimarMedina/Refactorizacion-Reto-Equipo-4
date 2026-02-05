@@ -13,7 +13,9 @@ class Alumnos extends Model {
         'apellidos',
         'telefono',
         'ciudad',
-        'user_id'
+        'user_id',
+        'curso_id',
+        'tutor_id'
     ];
 
     /**
@@ -35,5 +37,12 @@ class Alumnos extends Model {
      */
     public function notasAsignatura(): HasMany {
         return $this->hasMany(NotaAsignatura::class);
+    }
+
+    public function curso(): BelongsTo{
+        return $this->belongsTo(Curso::class,'curso_id','id');
+    }
+    public function tutor(): BelongsTo{
+        return $this->belongsTo(TutorEgibide::class,'tutor_id','user_id');
     }
 }

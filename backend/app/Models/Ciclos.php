@@ -41,4 +41,12 @@ class Ciclos extends Model {
     public function competenciasTec(): HasMany {
         return $this->hasMany(CompetenciaTec::class);
     }
+
+    public function tutores(){
+        return $this->belongsToMany(TutorEgibide::class,'ciclo_tutor','curso_id','tutor_id');
+    }
+
+    public function alumnos(){
+        return $this->hasMany(Alumnos::class,'curso_id','id');
+    }
 }

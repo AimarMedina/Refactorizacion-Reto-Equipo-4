@@ -6,10 +6,6 @@ const authStore = useAuthStore();
 function logout() {
   authStore.logout();
 }
-
-let user = authStore.fetchCurrentUser()
-console.log(user)
-
 </script>
 
 <template>

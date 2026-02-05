@@ -3,13 +3,14 @@ import type { Empresa } from "@/interfaces/Empresa";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useAuthStore } from "./auth";
+import type { Curso } from "@/interfaces/Curso";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
   const alumnosAsignados = ref<Alumno[]>([]);
   const empresasAsignadas = ref<Empresa[]>([]);
-
+  const misCursos = ref<Curso[]>([])
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -63,6 +64,7 @@ export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
       loading.value = false;
     }
   }
+  // Traer alumnos asignados
   async function fetchEmpresasAsignadas(tutorId: string) {
     loading.value = true;
     try {

@@ -36,16 +36,4 @@ class FamiliaProfesional extends Model {
     public function competenciasTransversales(): HasMany {
         return $this->hasMany(CompetenciaTransversal::class);
     }
-
-    /**
-     * Get all tutores that owns this familia profesional
-     */
-    public function tutores(): BelongsToMany {
-        return $this->belongsToMany(
-            TutorEgibide::class,
-            'familia_tutor',
-            'familias_profesionales_id',
-            'tutor_id'
-        )->withTimestamps();
-    }
 }

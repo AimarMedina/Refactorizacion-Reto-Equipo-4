@@ -20,20 +20,12 @@ return new class extends Migration {
                 ->constrained('alumnos')
                 ->cascadeOnDelete()->cascadeOnUpdate();
 
-            $table->foreignId('tutor_id')->nullable()
-                ->constrained('tutores')
-                ->nullOnDelete()->cascadeOnUpdate();
-
             $table->foreignId('instructor_id')->nullable()
                 ->constrained('instructores')
                 ->nullOnDelete()->cascadeOnUpdate();
 
             $table->foreignId('empresa_id')->nullable()
                 ->constrained('empresas')
-                ->restrictOnDelete()->cascadeOnUpdate();
-
-            $table->foreignId('curso_id')
-                ->constrained('cursos')
                 ->restrictOnDelete()->cascadeOnUpdate();
 
             $table->timestamps();
