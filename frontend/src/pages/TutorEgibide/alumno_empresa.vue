@@ -16,15 +16,13 @@ const error = ref<string | null>(null);
 
 // Obtener parámetros de la ruta
 const alumnoId = Number(route.params.alumnoId);
-
 onMounted(async () => {
   try {
     // Buscar el alumno
     alumno.value =
-      tutorEgibideStore.alumnosAsignados.find((a: Alumno) => {
-        return Number(a.pivot?.alumno_id) === alumnoId;
-      }) || null;
-
+      tutorEgibideStore.alumnosAsignados.find(
+        (a: Alumno) => Number(a.id) === Number(alumnoId)
+      ) || null;
     if (!alumno.value) {
       error.value = "Alumno no encontrado";
       console.error("No se encontró el alumno con ID:", alumnoId);
@@ -57,11 +55,7 @@ const volverAlumnos = () => {
     </div>
 
     <!-- Error -->
-    <div
-      v-else-if="error"
-      class="alert alert-danger d-flex align-items-center"
-      role="alert"
-    >
+    <div v-else-if="error" class="alert alert-danger d-flex align-items-center" role="alert">
       <i class="bi bi-exclamation-triangle-fill me-2"></i>
       <div>
         {{ error }}
@@ -85,11 +79,7 @@ const volverAlumnos = () => {
       <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
-            <a
-              href="#"
-              @click.prevent="volverAlumnos"
-              class="text-decoration-none"
-            >
+            <a href="#" @click.prevent="volverAlumnos" class="text-decoration-none">
               <i class="bi bi-arrow-left"></i>
               Alumnos
             </a>

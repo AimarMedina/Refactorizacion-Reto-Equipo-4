@@ -37,7 +37,7 @@ $grays: (
 
 // scss-docs-start color-variables
 $blue:    #0d6efd !default;
-$indigo:  #6610f2 !default;
+$indigo:  #511C5E !default;
 $purple:  #6f42c1 !default;
 $pink:    #d63384 !default;
 $red:     #dc3545 !default;
@@ -311,6 +311,7 @@ $dark:          $gray-900 !default;
 // scss-docs-start theme-colors-map
 $theme-colors: (
   "primary":    $primary,
+  "indigo":    $indigo,
   "secondary":  $secondary,
   "success":    $success,
   "info":       $info,

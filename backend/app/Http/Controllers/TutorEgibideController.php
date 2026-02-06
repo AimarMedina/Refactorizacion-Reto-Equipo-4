@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alumnos;
 use App\Models\Ciclos;
+use App\Models\Curso;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Models\TutorEgibide;
@@ -19,7 +21,7 @@ class TutorEgibideController extends Controller
 
         $tutor = TutorEgibide::where('user_id', $userId)->firstOrFail();
 
-        $alumnos = $tutor->alumnosConEstancia()->get();
+        $alumnos = $tutor->alumnos()->with('estancias.empresa')->get();
 
         return response()->json($alumnos);
     }
@@ -98,13 +100,7 @@ class TutorEgibideController extends Controller
 
 
         return response()->json([
-            'tutor' => [
-                'nombre'    => $tutor->nombre,
-                'apellidos' => $tutor->apellidos,
-                'telefono'  => $tutor->telefono,
-                'ciudad'    => $tutor->ciudad,
-                'email'     => $email,
-            ],
+            'tutor' => $tutor,
             'counts' => [
                 'alumnos_asignados'  => $alumnosAsignados,
                 'empresas_asignadas' => $alumnosConEstancia,
@@ -112,6 +108,33 @@ class TutorEgibideController extends Controller
         ]);
     }
 
+    public function asignarAlumno(Request $request)
+    {
+        $request->validate([
+            'alumno_id' => 'required|exists:alumnos,id',
+            'tutor_id'  => 'required|exists:users,id', // suponiendo que tutores son usuarios
+        ]);
+
+        $alumno = Alumnos::find($request->alumno_id);
+        $tutorId = $request->tutor_id;
+
+        try {
+            // Asignación simple, suponiendo campo tutor_id en tabla alumnos
+            $alumno->tutor_id = $tutorId;
+            $alumno->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Alumno asignado correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al asignar alumno',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 
     public function me(Request $request)
     {
@@ -168,5 +191,22 @@ class TutorEgibideController extends Controller
                 'message' => 'Error al guardar la estancia: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function getMisCursosConAlumnosSinTutor(Request $req, $tutorId)
+    {
+        $tutor = TutorEgibide::find($tutorId);
+
+        // Obtenemos los cursos del tutor con su ciclo y alumnos sin tutor asignado
+        $cursos = $tutor->cursos()
+            ->with([
+                'ciclo', // cargamos el ciclo de cada curso
+                'alumnos' => function ($query) {
+                    $query->whereNull('tutor_id'); // solo alumnos sin tutor
+                }
+            ])
+            ->get();
+
+        return response()->json($cursos);
     }
 }
