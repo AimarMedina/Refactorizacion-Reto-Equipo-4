@@ -106,12 +106,6 @@ async function guardarCalificacionesTecnicas() {
     props.alumnoId,
     payload,
   );
-
-  if (ok) {
-    setTimeout(() => {
-      volver();
-    }, 1000);
-  }
 }
 </script>
 

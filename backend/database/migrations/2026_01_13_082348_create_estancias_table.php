@@ -12,9 +12,9 @@ return new class extends Migration {
         Schema::create('estancias', function (Blueprint $table) {
             $table->id();
             $table->string('puesto', 150)->nullable();
-            $table->date('fecha_inicio');
+            $table->date('fecha_inicio')->nullable();
             $table->date('fecha_fin')->nullable();
-            $table->unsignedInteger('horas_totales');
+            $table->unsignedInteger('horas_totales')->nullable();
 
             $table->foreignId('alumno_id')
                 ->constrained('alumnos')

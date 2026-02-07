@@ -49,29 +49,17 @@
       </div>
     </div>
 
-    <!-- Toast de notificación -->
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-      <div ref="toast" class="toast align-items-center text-white bg-success border-0" role="alert"
-           aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-          <div class="toast-body">
-            Alumno asignado correctamente.
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                  aria-label="Close"></button>
-        </div>
-      </div>
-    </div>
+    <Toast v-if="message" :message="message" :type="messageType" />
   </div>
 </template>
 
 <script setup>
 import { useTutorEgibideStore } from '@/stores/tutorEgibide';
 import { onMounted, ref } from 'vue';
-
+import Toast from '@/components/Notification/Toast.vue';
 const storeTutor = useTutorEgibideStore();
-const toast = ref(null);
-
+let message = ref(null);
+let messageType = ref(null);
 onMounted(async () => {
   await storeTutor.fetchInicioTutor();
   await storeTutor.fetchAlumnosDeMiCursoSinTutorAsignado(storeTutor.inicio.tutor.id);
@@ -84,11 +72,12 @@ const asignarmeAlumno = async (alumno) => {
     await storeTutor.fetchAlumnosDeMiCursoSinTutorAsignado(storeTutor.inicio.tutor.id);
 
     // mostrar toast
-    const bsToast = new bootstrap.Toast(toast.value);
-    bsToast.show();
+    message.value = 'Alumno asignado correctamente';
+    messageType.value = 'success';
   } catch (error) {
     console.error(error);
-    alert('Error al asignar el alumno.');
+    message = 'Error al asignar alumno';
+    type = 'error';
   }
 };
 </script>

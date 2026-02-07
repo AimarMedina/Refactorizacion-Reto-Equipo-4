@@ -183,7 +183,7 @@ class AlumnosController extends Controller {
             ->with('curso.ciclo.asignaturas')
             ->firstOrFail();
 
-        $asignaturas = $estancia->curso->ciclo->asignaturas;
+        $asignaturas = $estancia->alumno->curso->ciclo->asignaturas;
 
         return response()->json($asignaturas, 200);
     }

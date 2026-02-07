@@ -8,25 +8,29 @@ use App\Models\TutorEmpresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class EmpresasController extends Controller {
+class EmpresasController extends Controller
+{
     /**
      * Display a listing of the resource.
      */
-    public function index() {
+    public function index()
+    {
         return Empresas::all();
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create() {
+    public function create()
+    {
         //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'nombre' => ['required'],
             'cif' => ['required'],
@@ -46,25 +50,29 @@ class EmpresasController extends Controller {
     /**
      * Display the specified resource.
      */
-    public function show(Empresas $empresas) {
+    public function show(Empresas $empresas)
+    {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Empresas $empresas) {
+    public function edit(Empresas $empresas)
+    {
         //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Empresas $empresas) {
+    public function update(Request $request, Empresas $empresas)
+    {
         //
     }
 
-    public function miEmpresa() {
+    public function miEmpresa()
+    {
         $userId = auth()->id();
 
         $empresa = DB::table('alumnos')
@@ -89,20 +97,22 @@ class EmpresasController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Empresas $empresas) {
+    public function destroy(Empresas $empresas)
+    {
         //
     }
 
-    public function storeEmpresaAsignada(Request $request) {
+    public function storeEmpresaAsignada(Request $request)
+    {
         $validated = $request->validate([
-            'alumno_id' => ['required', 'integer'],
-            'empresa_id' => ['required', 'integer'],
+            'alumno_id' => ['required', 'integer', 'exists:alumnos,id'],
+            'empresa_id' => ['required', 'integer', 'exists:empresas,id'],
         ]);
 
         $alumno_id = $validated['alumno_id'];
         $empresa_id = $validated['empresa_id'];
 
-        $estancia = Estancia::where('alumno_id', $alumno_id)->firstOrFail();
+        // Instructor de la empresa
         $instructor = TutorEmpresa::where('empresa_id', $empresa_id)->first();
 
         if (!$instructor) {
@@ -112,14 +122,22 @@ class EmpresasController extends Controller {
             ], 404);
         }
 
-        $estancia->update([
-            'empresa_id' => $empresa_id,
-            'instructor_id' => $instructor->id,
-        ]);
+        $estancia = Estancia::updateOrCreate(
+            [
+                // Claves para buscar la estancia
+                'alumno_id' => $alumno_id,
+            ],
+            [
+                'empresa_id' => $empresa_id,
+                'instructor_id' => $instructor->id,
+            ]
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Empresa e instructor asignados correctamente a la estancia',
+            'estancia' => $estancia
         ], 200);
     }
+
 }

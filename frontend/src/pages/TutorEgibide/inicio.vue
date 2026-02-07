@@ -6,7 +6,9 @@ const tutorStore = useTutorEgibideStore();
 
 onMounted(() => {
   tutorStore.fetchInicioTutor();
+  
 });
+
 </script>
 
 <template>

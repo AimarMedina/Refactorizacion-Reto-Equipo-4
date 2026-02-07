@@ -23,7 +23,7 @@ onMounted(async () => {
     // Buscar el alumno
     alumno.value =
       tutorEgibideStore.alumnosAsignados.find((a: Alumno) => {
-        return Number(a.pivot?.alumno_id) === alumnoId;
+        return Number(a.user_id) === alumnoId;
       }) || null;
 
     if (!alumno.value) {

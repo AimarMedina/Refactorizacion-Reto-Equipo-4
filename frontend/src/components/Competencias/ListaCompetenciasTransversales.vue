@@ -69,11 +69,6 @@ async function guardarCalificacionesTransversales() {
     payload,
   );
 
-  if (ok) {
-    setTimeout(() => {
-      volver();
-    }, 1000);
-  }
 }
 </script>
 
@@ -111,9 +106,7 @@ async function guardarCalificacionesTransversales() {
         :key="competencia.id"
       >
         <label :for="`competencia-${competencia.id}`" class="mx-1">
-          {{ competencia.descripcion }}
-          <i class="bi bi-arrow-right mr-1"></i>
-          <b> Calificación:</b>
+          {{ competencia.descripcion }}:
         </label>
         <select
           class="form-select form-select-sm bg-light"

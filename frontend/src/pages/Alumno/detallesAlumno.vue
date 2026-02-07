@@ -35,21 +35,13 @@ onMounted(async () => {
   try {
     isLoading.value = true;
 
-    if (!store.value.alumnosAsignados || store.value.alumnosAsignados.length === 0) {
       await store.value.fetchAlumnosAsignados(tutorId);
-    }
-
-    if (!empresaStore.empresas || empresaStore.empresas.length === 0) {
-      await empresaStore.fetchEmpresas();
-    }
-
-    // Buscar alumno AHORA que los datos están cargados
+    
     alumno.value = store.value.alumnosAsignados.find(a => a.id === alumnoId) || null;
     if (!alumno.value) {
       error.value = "Alumno no encontrado";
     }
 
-    console.log("Alumno encontrado:", alumno.value);
   } catch (err) {
     console.error(err);
     error.value = "Error al cargar los datos del alumno";
@@ -231,9 +223,12 @@ const formatDate = (dateString: string) => {
     <div class="info-item">
       <i class="bi bi-calendar-range-fill text-primary me-2"></i>
       <span class="text-muted">Periodo:</span>
-      <strong class="ms-2">
-        {{ alumno.estancias?.[0]?.fecha_inicio ? formatDate(alumno.estancias?.[0]?.fecha_inicio) : 'Por definir' }} -
-        {{ alumno.estancias?.[0]?.fecha_fin ? formatDate(alumno.estancias?.[0]?.fecha_fin) : 'Por definir' }}
+      <strong class="ms-2" v-if="alumno.estancias?.[0]?.fecha_inicio && alumno.estancias?.[0]?.fecha_fin">
+        {{  formatDate(alumno.estancias?.[0]?.fecha_inicio) }} -
+        {{ formatDate(alumno.estancias?.[0]?.fecha_fin) }}
+      </strong>
+      <strong class="ms-2" v-else>
+        Por definir
       </strong>
     </div>
   </div>

@@ -32,27 +32,28 @@ class TutorEgibideController extends Controller
 
         $tutor = TutorEgibide::where('user_id', $userId)->firstOrFail();
 
-        // Obtener empresas únicas a través de las estancias
-        $empresas = Empresas::whereHas('estancias', function ($query) use ($tutor) {
+        $empresas = Empresas::whereHas('estancias.alumno', function ($query) use ($tutor) {
             $query->where('tutor_id', $tutor->id);
         })->get();
 
         return response()->json($empresas);
     }
 
+
     public function getDetalleEmpresa(Request $request, $empresaId)
     {
         $userId = $request->user()->id;
         $tutor = TutorEgibide::where('user_id', $userId)->firstOrFail();
 
-        // Obtener empresa con instructor
-        $empresa = Empresas::with(['instructores' => function ($query) use ($tutor) {
-            $query->whereHas('estancias', function ($q) use ($tutor) {
-                $q->where('tutor_id', $tutor->id);
-            });
-        }])
+        $empresa = Empresas::with([
+            'instructores' => function ($query) use ($tutor) {
+                $query->whereHas('estancias.alumno', function ($q) use ($tutor) {
+                    $q->where('tutor_id', $tutor->id);
+                });
+            }
+        ])
             ->where('id', $empresaId)
-            ->whereHas('estancias', function ($query) use ($tutor) {
+            ->whereHas('estancias.alumno', function ($query) use ($tutor) {
                 $query->where('tutor_id', $tutor->id);
             })
             ->firstOrFail();
@@ -60,10 +61,12 @@ class TutorEgibideController extends Controller
         return response()->json($empresa);
     }
 
+
     public function getTutoresByCiclo($ciclo_id)
     {
         $ciclo = Ciclos::find($ciclo_id);
-        if (!$ciclo) return response()->json([], 404);
+        if (!$ciclo)
+            return response()->json([], 404);
 
         $familia = $ciclo->familiaProfesional;
         $tutores = $familia?->tutores ?? collect();
@@ -84,6 +87,7 @@ class TutorEgibideController extends Controller
         }
 
         $email = $user->email;
+        $tutor['email'] = $email;
         $hoy = now();
 
         $alumnosAsignados = $tutor->alumnos()->count();
@@ -102,7 +106,7 @@ class TutorEgibideController extends Controller
         return response()->json([
             'tutor' => $tutor,
             'counts' => [
-                'alumnos_asignados'  => $alumnosAsignados,
+                'alumnos_asignados' => $alumnosAsignados,
                 'empresas_asignadas' => $alumnosConEstancia,
             ],
         ]);
@@ -112,7 +116,7 @@ class TutorEgibideController extends Controller
     {
         $request->validate([
             'alumno_id' => 'required|exists:alumnos,id',
-            'tutor_id'  => 'required|exists:users,id', // suponiendo que tutores son usuarios
+            'tutor_id' => 'required|exists:users,id', // suponiendo que tutores son usuarios
         ]);
 
         $alumno = Alumnos::find($request->alumno_id);
@@ -158,25 +162,23 @@ class TutorEgibideController extends Controller
     {
         // Validar los datos
         $validated = $request->validate([
-            'alumno_id'     => 'required|exists:alumnos,id',
-            'fecha_inicio'  => 'required|date',
-            'fecha_fin'     => 'nullable|date|after_or_equal:fecha_inicio',
+            'alumno_id' => 'required|exists:alumnos,id',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
             'horas_totales' => 'required|integer|min:1',
         ]);
 
         try {
             // Obtener tutor logueado
             $user = $request->user();
-            $tutor = TutorEgibide::where('user_id', $user->id)->firstOrFail();
 
             // Crear o actualizar estancia por alumno_id
             $estancia = Estancia::updateOrCreate(
                 ['alumno_id' => $validated['alumno_id']], // Condición para actualizar
                 [
-                    'fecha_inicio'  => $validated['fecha_inicio'],
-                    'fecha_fin'     => $validated['fecha_fin'] ?? null,
+                    'fecha_inicio' => $validated['fecha_inicio'],
+                    'fecha_fin' => $validated['fecha_fin'] ?? null,
                     'horas_totales' => $validated['horas_totales'],
-                    'tutor_id'      => $tutor->id,
                 ]
             );
 

@@ -26,7 +26,7 @@ class TutorEmpresaController extends Controller {
 
         $instructor = TutorEmpresa::where('user_id', $userId)->firstOrFail();
 
-        $alumnos = $instructor->alumnosConEstancia()->get();
+        $alumnos = $instructor->alumnos()->with('estancias.empresa')->get();
 
         return response()->json($alumnos);
     }

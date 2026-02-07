@@ -38,7 +38,6 @@ export const useTutorEmpresaStore = defineStore("tutorEmpresa", () => {
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         setMessage(data.message || "Error desconocido, inténtalo más tarde", "error");
         inicio.value = null;

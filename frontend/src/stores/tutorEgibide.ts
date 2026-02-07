@@ -48,7 +48,6 @@ export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
       );
 
       const data = await response.json();
-
       if (!response.ok) {
         setMessage(
           data.message || "Error desconocido al cargar alumnos",
@@ -82,7 +81,6 @@ export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
       );
 
       const data = await response.json();
-
       if (!response.ok) {
         setMessage(
           data.message || "Error desconocido al cargar empresas",

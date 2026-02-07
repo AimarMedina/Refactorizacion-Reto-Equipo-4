@@ -15,7 +15,7 @@ class InstructorSeeder extends Seeder {
                 'telefono' => '600555666',
                 'ciudad' => 'Vitoria-Gasteiz',
                 'empresa_id' => 1,
-                'user_id' => 4,
+                'user_id' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
