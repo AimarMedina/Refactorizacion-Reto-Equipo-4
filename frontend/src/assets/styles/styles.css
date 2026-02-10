@@ -292,6 +292,9 @@ abbr[title] {
   text-decoration-skip-ink: none;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
 address {
   margin-bottom: 1rem;
   font-style: normal;

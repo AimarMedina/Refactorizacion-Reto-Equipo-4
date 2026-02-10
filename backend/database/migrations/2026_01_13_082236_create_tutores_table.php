@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('nombre', 100);
             $table->string('apellidos', 150);
             $table->string('telefono', 20)->nullable();
+            $table->string('alias', 50)->nullable();
             $table->string('ciudad', 120)->nullable();
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->timestamps();

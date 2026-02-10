@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import router from "@/router";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
-
+const user = authStore.currentUser;
+console.log(user);
 function logout() {
   authStore.logout();
 }
@@ -11,7 +13,7 @@ function logout() {
 <template>
   <nav class="navbar navbar-expand-lg island">
     <div class="container-fluid">
-      <img src="../assets/images/logotipo.png" alt="logotipo" height="50" />
+      <img src="../assets/images/logotipo.png" alt="logotipo" height="50" @click="router.push('/'+user?.role+'/inicio')" class=" cursor-pointer"/>
       <div class="dropdown">
         <button class="btn p-0 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="bi bi-three-dots-vertical fs-5"></i>
@@ -26,8 +28,6 @@ function logout() {
           </li>
         </ul>
       </div>
-
-
     </div>
   </nav>
 </template>

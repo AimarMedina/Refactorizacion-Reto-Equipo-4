@@ -1,9 +1,9 @@
 import type { Alumno } from "@/interfaces/Alumno";
+import type { Curso } from "@/interfaces/Curso";
 import type { Empresa } from "@/interfaces/Empresa";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useAuthStore } from "./auth";
-import type { Curso } from "@/interfaces/Curso";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -248,13 +248,12 @@ export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
 
       // Actualizar store local
       const alumnoStore = alumnosAsignados.value.find(
-        (a) =>
-          Number(a.pivot?.alumno_id) === alumnoId || Number(a.id) === alumnoId,
+        (a) => Number(a.user_id) === alumnoId || Number(a.id) === alumnoId,
       );
 
       if (alumnoStore) {
         (alumnoStore as any).pivot = {
-          ...(alumnoStore.pivot ?? { alumno_id: alumnoId }),
+          ...(alumnoStore.estancias ?? { alumno_id: alumnoId }),
           fecha_inicio: fechaInicio,
           fecha_fin: fechaFin,
           horas_totales: horasTotales,
@@ -275,15 +274,18 @@ export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
       (a) => a.id === alumnoId,
     );
     if (!alumnoToUpdate) return;
-
     // Aseguramos que pivot existe
-    if (!alumnoToUpdate.pivot) {
-      alumnoToUpdate.pivot = {
+    if (!alumnoToUpdate.estancias) {
+      alumnoToUpdate.estancias = {
         alumno_id: alumnoId,
         empresa_id: empresaId,
       } as any;
     } else {
-      alumnoToUpdate.pivot.empresa_id = empresaId;
+      const estancia = alumnoToUpdate?.estancias?.[0];
+
+      if (estancia) {
+        estancia.empresa_id = empresaId;
+      }
     }
   }
 

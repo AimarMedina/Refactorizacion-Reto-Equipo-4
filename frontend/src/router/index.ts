@@ -26,14 +26,6 @@ const router = createRouter({
           meta: { role: "alumno" },
         },
         {
-          path: "alumno/informacion",
-          name: "alumno-informacion",
-          components: {
-            main: () => import("@/pages/Alumno/informacion.vue"),
-          },
-          meta: { role: "alumno" },
-        },
-        {
           path: "alumno/mis-datos",
           name: "alumno-datos",
           components: {
@@ -66,7 +58,7 @@ const router = createRouter({
           meta: { role: "alumno" },
         },
         {
-          path: "tutor-egibide/inicio",
+          path: "tutor_egibide/inicio",
           name: "tutor_egibide-inicio",
           components: {
             main: () => import("@/pages/TutorEgibide/inicio.vue"),
@@ -74,15 +66,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/informacion",
-          name: "tutor_egibide-informacion",
-          components: {
-            main: () => import("@/pages/TutorEgibide/informacion.vue"),
-          },
-          meta: { role: "tutor_egibide" },
-        },
-        {
-          path: "tutor-egibide/grados",
+          path: "tutor_egibide/grados",
           name: "tutor_egibide-grados",
           components: {
             main: () => import("@/pages/TutorEgibide/misGrados.vue"),
@@ -90,7 +74,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/alumnos",
+          path: "tutor_egibide/alumnos",
           name: "tutor_egibide-alumnos",
           components: {
             main: () => import("@/pages/TutorEgibide/alumnos.vue"),
@@ -98,7 +82,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/empresas",
+          path: "tutor_egibide/empresas",
           name: "tutor_egibide-empresas",
           components: {
             main: () => import("@/pages/TutorEgibide/empresas.vue"),
@@ -106,7 +90,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/alumno-empresa/:alumnoId/asignar-empresa",
+          path: "tutor_egibide/alumno-empresa/:alumnoId/asignar-empresa",
           name: "tutor_egibide-alumno_empresa",
           components: {
             main: () => import("@/pages/TutorEgibide/alumno_empresa.vue"),
@@ -114,7 +98,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/horas-periodo/:alumnoId/asignar-horas-periodo",
+          path: "tutor_egibide/horas-periodo/:alumnoId/asignar-horas-periodo",
           name: "tutor_egibide-horas_periodo",
           components: {
             main: () => import("@/pages/TutorEgibide/horas_periodo.vue"),
@@ -122,7 +106,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/seguimiento/:alumnoId",
+          path: "tutor_egibide/seguimiento/:alumnoId",
           name: "tutor_egibide-seguimiento",
           components: {
             main: () => import("@/pages/TutorEgibide/seguimiento.vue"),
@@ -130,7 +114,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/seguimiento-general/:alumnoId",
+          path: "tutor_egibide/seguimiento-general/:alumnoId",
           name: "tutor_egibide-seguimiento-general",
           components: {
             main: () => import("@/pages/TutorEgibide/general.vue"),
@@ -138,7 +122,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/seguimiento-general/:alumnoId/nuevo-seguimiento",
+          path: "tutor_egibide/seguimiento-general/:alumnoId/nuevo-seguimiento",
           name: "tutor_egibide-nuevo-seguimiento-general",
           components: {
             main: () => import("@/pages/TutorEgibide/nuevo_general.vue"),
@@ -146,7 +130,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/seguimiento-cuaderno/:alumnoId",
+          path: "tutor_egibide/seguimiento-cuaderno/:alumnoId",
           name: "tutor_egibide-seguimiento-cuaderno",
           components: {
             main: () => import("@/pages/TutorEgibide/cuaderno.vue"),
@@ -154,7 +138,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/alumno-empresa/:alumnoId/competencias",
+          path: "tutor_egibide/alumno-empresa/:alumnoId/competencias",
           name: "tutor_egibide-competencias",
           components: {
             main: () => import("@/pages/TutorEgibide/competencias.vue"),
@@ -162,7 +146,7 @@ const router = createRouter({
           meta: { role: "tutor_egibide" },
         },
         {
-          path: "tutor-egibide/alumno-empresa/:alumnoId/calificaciones",
+          path: "tutor_egibide/alumno-empresa/:alumnoId/calificaciones",
           name: "tutor_egibide-calificaciones",
           components: {
             main: () => import("@/pages/TutorEgibide/calificaciones.vue"),
@@ -171,7 +155,7 @@ const router = createRouter({
         },
         {
           name: "tutor_egibide-detalle_alumno",
-          path: "tutor-egibide/alumnos-asignados/:alumnoId",
+          path: "tutor_egibide/alumnos-asignados/:alumnoId",
           components: {
             main: () => import("@/pages/Alumno/detallesAlumno.vue"),
           },
@@ -179,7 +163,7 @@ const router = createRouter({
         },
         {
           name: "tutor_egibide-empresas_asignadas",
-          path: "tutor-egibide/empresa-asignados",
+          path: "tutor_egibide/empresa-asignados",
           components: {
             main: () => import("@/pages/TutorEgibide/empresas.vue"),
           },
@@ -187,7 +171,7 @@ const router = createRouter({
         },
         {
           name: "tutor_egibide-detalle_empresa",
-          path: "tutor-egibide/empresa-asignados/:empresaId",
+          path: "tutor_egibide/empresa-asignados/:empresaId",
           components: {
             main: () => import("@/pages/TutorEgibide/detallesEmpresa.vue"),
           },
@@ -202,23 +186,7 @@ const router = createRouter({
           meta: {role: "tutor_egibide"},
         },
         {
-          path: "tutor-empresa/inicio",
-          name: "tutor_empresa-inicio",
-          components: {
-            main: () => import("@/pages/TutorEmpresa/inicio.vue"),
-          },
-          meta: { role: "tutor_empresa" },
-        },
-        {
-          path: "tutor-empresa/informacion",
-          name: "tutor-empresa-informacion",
-          components: {
-            main: () => import("@/pages/TutorEmpresa/informacion.vue"),
-          },
-          meta: { role: "tutor_empresa" },
-        },
-        {
-          path: "tutor-empresa/alumnos-asignados",
+          path: "tutor_empresa/alumnos-asignados",
           name: "tutor_empresa-alumnos_asignados",
           components: {
             main: () => import("@/pages/TutorEmpresa/alumnos_asignados.vue"),
@@ -227,14 +195,14 @@ const router = createRouter({
         },
         {
           name: "tutor_empresa-detalle_alumno",
-          path: "tutor-empresa/alumnos-asignados/:alumnoId",
+          path: "tutor_empresa/alumnos-asignados/:alumnoId",
           components: {
             main: () => import("@/pages/Alumno/detallesAlumno.vue"),
           },
           meta: { role: "tutor_empresa" },
         },
         {
-          path: "tutor-empresa/alumnos-asignados/:alumnoId/competencias",
+          path: "tutor_empresa/alumnos-asignados/:alumnoId/competencias",
           name: "tutor_empresa-competencias",
           components: {
             main: () => import("@/pages/TutorEmpresa/competencias.vue"),
@@ -242,7 +210,7 @@ const router = createRouter({
           meta: { role: "tutor_empresa" },
         },
         {
-          path: "tutor-empresa/alumnos-asignados/:alumnoId/calificacion",
+          path: "tutor_empresa/alumnos-asignados/:alumnoId/calificacion",
           name: "tutor_empresa-calificacion",
           components: {
             main: () => import("@/pages/TutorEmpresa/calificacion.vue"),
@@ -254,14 +222,6 @@ const router = createRouter({
           name: "admin-inicio",
           components: {
             main: () => import("@/pages/Admin/inicio.vue"),
-          },
-          meta: { role: "admin" },
-        },
-        {
-          path: "admin/informacion",
-          name: "admin-informacion",
-          components: {
-            main: () => import("@/pages/Admin/informacion.vue"),
           },
           meta: { role: "admin" },
         },
@@ -293,7 +253,7 @@ const router = createRouter({
           path: "admin/matriz-competencias",
           name: "admin-matriz-competencias",
           components: {
-            main: () => import("@/pages/CompRa.vue"), 
+            main: () => import("@/pages/CompRa.vue"),
           },
           meta: { role: "admin" },
         },
@@ -369,6 +329,14 @@ const router = createRouter({
           },
           meta: { role: "admin" },
         },
+        {
+          path: "admin/importar",
+          name: "admin-importar",
+          components: {
+            main: () => import("@/pages/Admin/importacionDatos.vue"),
+          },
+          meta: { role: "admin" },
+        },
 
       ],
     },
@@ -395,9 +363,9 @@ router.beforeEach(async (to) => {
       case "alumno":
         return { path: "/alumno/inicio" };
       case "tutor_egibide":
-        return { path: "/tutor-egibide/inicio" };
+        return { path: "/tutor_egibide/inicio" };
       case "tutor_empresa":
-        return { path: "/tutor-empresa/inicio" };
+        return { path: "/tutor_empresa/inicio" };
       case "admin":
         return { path: "/admin/inicio" };
       default:
@@ -410,9 +378,9 @@ router.beforeEach(async (to) => {
       case "alumno":
         return { path: "/alumno/inicio" };
       case "tutor_egibide":
-        return { path: "/tutor-egibide/inicio" };
+        return { path: "/tutor_egibide/inicio" };
       case "tutor_empresa":
-        return { path: "/tutor-empresa/inicio" };
+        return { path: "/tutor_empresa/inicio" };
       case "admin":
         return { path: "/admin/inicio" };
       default:
