@@ -38,4 +38,18 @@ class AlumnoEntregaController extends Controller
 
         return response()->json($entrega, 201);
     }
+
+    public function actualizar(Request $request, $idEntrega)
+    {
+        $entrega = AlumnoEntrega::find($idEntrega);
+
+        $data = $request->validate([
+            'observaciones' => 'required|string',
+            'feedback' => 'required|string',
+        ]);
+
+        $entrega  = $entrega->update($data);
+
+        return response()->json($entrega);
+    }
 }

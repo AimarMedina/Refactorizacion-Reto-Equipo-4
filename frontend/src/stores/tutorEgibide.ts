@@ -196,7 +196,6 @@ export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
       }
       inicio.value = data;
       tutor.value = data.tutor as TutorEgibide;
-      console.log(tutor.value);
       return true;
     } finally {
       loadingInicio.value = false;
@@ -346,7 +345,6 @@ export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
       );
 
       const data = await response.json();
-      console.log(data);
       if (!response.ok) {
         setMessage(data.message || "Error al cargar entregas", "error");
         return false;
@@ -387,8 +385,6 @@ export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
         return false;
       }
 
-      await fetchEntregas(String(authStore.currentUser?.id));
-
       setMessage("Entrega actualizada correctamente", "success");
       return true;
     } catch (err) {
@@ -418,7 +414,6 @@ export const useTutorEgibideStore = defineStore("tutorEgibide", () => {
         return false;
       }
 
-      await fetchEntregas(String(authStore.currentUser?.id));
       setMessage("Entrega creada", "success");
       return true;
     } catch (err) {

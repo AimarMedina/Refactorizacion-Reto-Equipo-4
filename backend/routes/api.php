@@ -83,6 +83,7 @@ Route::middleware('auth:sanctum')->group(
         Route::post('/entregas', [EntregaController::class, 'store']);
         Route::delete('/entregas/{id}', [EntregaController::class, 'destroy']);
         Route::post('/alumno/{alumnoId}/entrega', [AlumnoEntregaController::class, 'storeEntrega']);
+        Route::put('/cuaderno/{idEntrega}/', [AlumnoEntregaController::class, 'actualizar']);
 
         // Tutor Egibide
         Route::get('/tutorEgibide/inicio', [TutorEgibideController::class, 'inicioTutor']);
