@@ -184,11 +184,8 @@ class AlumnosController extends Controller
 
     public function getAsignaturasAlumno($alumno_id)
     {
-        $estancia = Estancia::where('alumno_id', $alumno_id)
-            ->with('curso.ciclo.asignaturas')
-            ->firstOrFail();
 
-        $asignaturas = $estancia->alumno->curso->ciclo->asignaturas;
+        $asignaturas = Alumnos::find($alumno_id)->ciclo->asignaturas;
 
         return response()->json($asignaturas, 200);
     }

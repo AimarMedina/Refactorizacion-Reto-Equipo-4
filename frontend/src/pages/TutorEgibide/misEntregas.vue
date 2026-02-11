@@ -6,7 +6,7 @@ import { onMounted, ref } from 'vue';
 import Toast from '@/components/Notification/Toast.vue';
 const authStore = useAuthStore();
 const tutorStore = useTutorEgibideStore();
-
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 // --- EDICIÓN ---
 const editandoId = ref<number | null>(null);
 const editData = ref<{ observaciones: string; feedback: string }>({
@@ -51,7 +51,8 @@ async function crearNuevaEntrega() {
     tutorStore.fetchEntregas(String(tutorStore.tutor?.id));
 
 }
-
+const fileURL = (filename: string) => 
+    `${baseURL}/storage/entregas/${filename}`;
 onMounted(async () => {
     await tutorStore.fetchInicioTutor();
 
@@ -105,7 +106,7 @@ onMounted(async () => {
                             {{ cuaderno.alumno.nombre }} {{ cuaderno.alumno.apellidos }}
                         </h5>
 
-                        <a :href="`/storage/${cuaderno.url_entrega}`" target="_blank"
+                        <a :href="fileURL(cuaderno.url_entrega)" target="_blank"
                             class="btn btn-sm btn-outline-primary">
                             Ver PDF
                         </a>

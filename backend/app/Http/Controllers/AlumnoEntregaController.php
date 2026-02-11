@@ -5,6 +5,7 @@ use App\Models\AlumnoEntrega;
 use App\Models\Alumnos;
 use App\Models\EntregaCuaderno;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AlumnoEntregaController extends Controller
 {
@@ -26,17 +27,28 @@ class AlumnoEntregaController extends Controller
         $filename = time() . '_' . $file->getClientOriginalName();
 
         // Guardar el archivo en storage/app/public/entregas
-        $path = $file->storeAs('public/entregas', $filename);
+        $path = $file->storeAs('entregas', $filename, 'public');
 
-        // Crear registro en la base de datos
-        $entrega = AlumnoEntrega::create([
+        $entregaExistente = AlumnoEntrega::where('entrega_id', $request->input('entrega_id'))
+            ->where('alumno_id', $alumno->id)
+            ->first();
+
+        if ($entregaExistente && $entregaExistente->url_entrega) {
+            Storage::disk('public')->delete('entregas/' . $entregaExistente->url_entrega);
+        }
+
+        // Crear o actualizar registro en la base de datos
+        $entrega = AlumnoEntrega::updateOrCreate([
+            'entrega_id' => (int) $request->input('entrega_id'),
+            'alumno_id' => $alumno->id
+        ], [
             'alumno_id' => $alumno->id,
             'url_entrega' => $filename,
             'entrega_id' => (int) $request->input('entrega_id'),
             'fecha_entrega' => now(),
         ]);
 
-        return response()->json($entrega, 201);
+        return response()->json([$entrega], 201);
     }
 
     public function actualizar(Request $request, $idEntrega)
@@ -48,7 +60,7 @@ class AlumnoEntregaController extends Controller
             'feedback' => 'required|string',
         ]);
 
-        $entrega  = $entrega->update($data);
+        $entrega = $entrega->update($data);
 
         return response()->json($entrega);
     }

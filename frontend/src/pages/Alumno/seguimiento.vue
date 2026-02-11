@@ -65,8 +65,8 @@
                             <div class="col-lg-4">
                                 <h6 class="text-uppercase text-muted small fw-bold mb-3">Tu Entrega</h6>
 
-                                <div v-if="!isPastDeadline(entrega.fecha_limite)">
-                                    <label
+<div v-if="!isPastDeadline(entrega.fecha_limite) && !entregaYaEvaluada(entrega)">
+                                <label
                                         class="upload-zone d-flex flex-column align-items-center justify-content-center w-100 p-4 rounded-3 cursor-pointer">
                                         <div class="text-center">
                                             <svg class="mb-3 text-secondary" width="40" height="40" fill="none"
@@ -110,7 +110,7 @@
                                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                                         <a :href="fileURL(e.url_entrega)" target="_blank"
                                                             class="text-decoration-none fw-bold text-primary">
-                                                            📄 Ver Archivo (V{{ index + 1 }})
+                                                            📄 Ver Archivo
                                                         </a>
                                                         <span v-if="index === entrega.entregas.length - 1"
                                                             class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill"
@@ -154,7 +154,7 @@
 <script setup>
 import { onMounted } from "vue";
 import { useAlumnosStore } from "@/stores/alumnos";
-
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 const alumnosStore = useAlumnosStore();
 
 onMounted(async () => {
@@ -173,6 +173,13 @@ const onFileChange = async (event, entregaId) => {
         console.error(e);
     }
 };
+const entregaYaEvaluada = (entrega) => {
+    if (!entrega.entregas || entrega.entregas.length === 0) return false
+
+    const ultima = entrega.entregas[entrega.entregas.length - 1]
+
+    return !!(ultima.feedback || ultima.observaciones)
+}
 
 const formatDateTime = (dateStr) => {
     if (!dateStr) return '';
@@ -182,7 +189,8 @@ const formatDateTime = (dateStr) => {
     });
 };
 
-const fileURL = (filename) => `/uploads/${filename}`;
+const fileURL = (filename) => 
+    `${baseURL}/storage/entregas/${filename}`;
 const isPastDeadline = (fecha_limite) => new Date() > new Date(fecha_limite);
 </script>
 
