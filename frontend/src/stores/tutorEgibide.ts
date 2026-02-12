@@ -7,6 +7,7 @@ import { useAuthStore } from "./auth";
 import type { EntregaCuaderno } from "@/interfaces/EntregaCuaderno";
 import type { TutorEgibide } from "@/interfaces/TutorEgibide";
 
+
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 export const useTutorEgibideStore = defineStore("tutorEgibide", () => {

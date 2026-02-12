@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Alumno } from "@/interfaces/Alumno";
-import type { Empresa } from "@/interfaces/Empresa";
-import { useEmpresasStore } from "@/stores/empresas";
+import type { Instructor } from "@/interfaces/Instructor";
 import { useTutorEgibideStore } from "@/stores/tutorEgibide";
 import { useTutorEmpresaStore } from "@/stores/tutorEmpresa";
+import { useInstructorStore } from "@/stores/instructor";
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -12,7 +12,7 @@ const router = useRouter();
 
 const tutorEgibideStore = useTutorEgibideStore();
 const tutorEmpresaStore = useTutorEmpresaStore();
-const empresaStore = useEmpresasStore();
+const instructorStore = useInstructorStore();
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);
@@ -30,13 +30,21 @@ const store = computed(() =>
 let alumno = ref<Alumno | null>(null);
 const horarioSemanal = ref<any[]>([]);
 
+// ✅ NUEVO: Estado para gestionar instructores
+const instructores = ref<Instructor[]>([]);
+const instructorActual = ref<Instructor | null>(null);
+const showInstructorModal = ref(false);
+const selectedInstructorId = ref<number | null>(null);
+const loadingInstructores = ref(false);
+const savingInstructor = ref(false);
+
 onMounted(async () => {
   try {
     isLoading.value = true;
 
     await store.value.fetchAlumnosAsignados(tutorId);
     
-    alumno.value = store.value.alumnosAsignados.find(a => a.id === alumnoId) || null;
+    alumno.value = store.value.alumnosAsignados.find((a: Alumno) => a.id === alumnoId) || null;
     
     if (!alumno.value) {
       error.value = "Alumno no encontrado";
@@ -52,6 +60,17 @@ onMounted(async () => {
       }
     }
 
+    // ✅ NUEVO: Cargar instructores si es tutor de Egibide y tiene empresa asignada
+    if (tipoTutor === "egibide" && alumno.value.estancias?.[0]?.empresa_id) {
+      await cargarInstructores();
+      
+      // Establecer instructor actual si existe
+      const instructorId = alumno.value.estancias?.[0]?.instructor_id;
+      if (instructorId) {
+        instructorActual.value = instructores.value.find(i => i.id === instructorId) || null;
+      }
+    }
+
   } catch (err) {
     console.error(err);
     error.value = "Error al cargar los datos del alumno";
@@ -59,6 +78,93 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+// ✅ NUEVO: Cargar instructores de la empresa
+const cargarInstructores = async () => {
+  const empresaId = alumno.value?.estancias?.[0]?.empresa_id;
+  if (!empresaId) return;
+
+  loadingInstructores.value = true;
+  try {
+    const data = await instructorStore.obtenerPorEmpresa(empresaId);
+    if (data) {
+      instructores.value = data;
+    }
+  } catch (err) {
+    console.error("Error al cargar instructores:", err);
+  } finally {
+    loadingInstructores.value = false;
+  }
+};
+
+// ✅ NUEVO: Abrir modal para cambiar/asignar instructor
+const abrirModalInstructor = () => {
+  selectedInstructorId.value = instructorActual.value?.id || null;
+  showInstructorModal.value = true;
+};
+
+// ✅ NUEVO: Cerrar modal
+const cerrarModal = () => {
+  showInstructorModal.value = false;
+  selectedInstructorId.value = null;
+};
+
+// ✅ NUEVO: Guardar cambio de instructor
+const guardarInstructor = async () => {
+  if (!selectedInstructorId.value) {
+    tutorEgibideStore.setMessage("Debes seleccionar un instructor", "error");
+    return;
+  }
+
+  const estanciaId = alumno.value?.estancias?.[0]?.id;
+  if (!estanciaId) {
+    tutorEgibideStore.setMessage("No hay estancia asociada", "error");
+    return;
+  }
+
+  savingInstructor.value = true;
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/tutorEgibide/asignar-cambiar-instructor`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          alumno_id: alumnoId,
+          instructor_id: selectedInstructorId.value,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      tutorEgibideStore.setMessage(data.message || "Error al cambiar instructor", "error");
+      return;
+    }
+
+    // Actualizar instructor actual
+    instructorActual.value = instructores.value.find(i => i.id === selectedInstructorId.value) || null;
+    
+    // Actualizar alumno en el store
+    if (alumno.value?.estancias?.[0]) {
+      alumno.value.estancias[0].instructor_id = selectedInstructorId.value;
+    }
+    
+    tutorEgibideStore.setMessage("Instructor asignado correctamente", "success");
+    cerrarModal();
+    
+  } catch (err) {
+    console.error("Error al guardar instructor:", err);
+    tutorEgibideStore.setMessage("Error de conexión", "error");
+  } finally {
+    savingInstructor.value = false;
+  }
+};
 
 const irACompetencias = () => {
   router.push({
@@ -129,14 +235,13 @@ const resumenHorario = computed(() => {
     return "Sin asignar";
   }
 
-  // Agrupar días con mismo horario
   const grupos: Record<string, string[]> = {};
 
   horarioSemanal.value.forEach((dia: any) => {
     const tramo = dia.horarios_tramo?.[0];
     if (!tramo) return;
 
-    const inicio = tramo.hora_inicio?.substring(0, 5); // "08:15:00" -> "08:15"
+    const inicio = tramo.hora_inicio?.substring(0, 5);
     const fin = tramo.hora_fin?.substring(0, 5);
     const pausa = dia.pausa_minutos || 0;
 
@@ -146,11 +251,9 @@ const resumenHorario = computed(() => {
     grupos[clave].push(dia.dia_semana);
   });
 
-  // Convertir grupos a formato compacto
   const partes = Object.entries(grupos).map(([clave, dias]) => {
     const [inicio, fin, pausa] = clave.split("-");
 
-    // Convertir días a letras
     const letras = dias
       .map((d) =>
         d === "Lunes"
@@ -296,7 +399,7 @@ const resumenHorario = computed(() => {
               </div>
             </div>
 
-            <!-- ✅ HORARIO SEMANAL -->
+            <!-- Horario semanal -->
             <div class="col-12">
               <div class="info-item">
                 <i class="bi bi-clock-history text-primary me-2"></i>
@@ -304,6 +407,62 @@ const resumenHorario = computed(() => {
                 <strong class="ms-2">{{ resumenHorario }}</strong>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ NUEVA CARD: Instructor -->
+      <div v-if="tipoTutor === 'egibide' && alumno.estancias?.[0]?.empresa_id" class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+              <i class="bi bi-person-badge-fill text-primary me-2"></i>
+              Instructor de Empresa
+            </h5>
+            <button 
+              class="btn btn-sm btn-outline-primary"
+              @click="abrirModalInstructor"
+              :disabled="loadingInstructores || instructores.length === 0"
+            >
+              <i :class="instructorActual ? 'bi bi-arrow-repeat' : 'bi bi-plus-circle'" class="me-1"></i>
+              {{ instructorActual ? 'Cambiar Instructor' : 'Asignar Instructor' }}
+            </button>
+          </div>
+
+          <div v-if="loadingInstructores" class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="text-muted mt-2 mb-0 small">Cargando instructores...</p>
+          </div>
+
+          <div v-else-if="instructorActual" class="instructor-info">
+            <div class="d-flex align-items-center">
+              <div class="instructor-avatar me-3">
+                <i class="bi bi-person-fill"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-1">{{ instructorActual.nombre }} {{ instructorActual.apellidos }}</h6>
+                <div class="text-muted small">
+                  <i class="bi bi-telephone me-1"></i>
+                  {{ instructorActual.telefono || 'Sin teléfono' }}
+                </div>
+                <div v-if="instructorActual.ciudad" class="text-muted small mt-1">
+                  <i class="bi bi-geo-alt me-1"></i>
+                  {{ instructorActual.ciudad }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-else-if="instructores.length === 0" class="alert alert-warning mb-0" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            No hay instructores disponibles en esta empresa.
+          </div>
+
+          <div v-else class="alert alert-info mb-0" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            No hay instructor asignado. Haz clic en "Asignar Instructor" para seleccionar uno.
           </div>
         </div>
       </div>
@@ -416,6 +575,98 @@ const resumenHorario = computed(() => {
         </div>
       </div>
     </div>
+
+    <!-- ✅ MODAL: Seleccionar Instructor -->
+    <div 
+      class="modal fade" 
+      :class="{ show: showInstructorModal, 'd-block': showInstructorModal }"
+      tabindex="-1" 
+      role="dialog"
+      :style="showInstructorModal ? 'background-color: rgba(0,0,0,0.5)' : ''"
+      @click.self="cerrarModal"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-person-badge me-2"></i>
+              {{ instructorActual ? 'Cambiar Instructor' : 'Asignar Instructor' }}
+            </h5>
+            <button 
+              type="button" 
+              class="btn-close" 
+              @click="cerrarModal"
+              :disabled="savingInstructor"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div v-if="instructores.length === 0" class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              No hay instructores disponibles en esta empresa.
+            </div>
+            <div v-else>
+              <div class="form-group">
+                <label class="form-label fw-semibold mb-3">
+                  Selecciona un instructor:
+                </label>
+                <div class="list-group">
+                  <label 
+                    v-for="instructor in instructores" 
+                    :key="instructor.id"
+                    class="list-group-item list-group-item-action cursor-pointer"
+                    :class="{ active: selectedInstructorId === instructor.id }"
+                  >
+                    <div class="d-flex align-items-center">
+                      <input 
+                        type="radio" 
+                        :value="instructor.id"
+                        v-model="selectedInstructorId"
+                        class="form-check-input me-3"
+                        :id="`instructor-${instructor.id}`"
+                      >
+                      <div class="flex-grow-1">
+                        <div class="fw-semibold">
+                          {{ instructor.nombre }} {{ instructor.apellidos }}
+                        </div>
+                        <small class="text-muted" v-if="instructor.telefono">
+                          <i class="bi bi-telephone me-1"></i>
+                          {{ instructor.telefono }}
+                        </small>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              @click="cerrarModal"
+              :disabled="savingInstructor"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-primary"
+              @click="guardarInstructor"
+              :disabled="!selectedInstructorId || savingInstructor"
+            >
+              <span v-if="savingInstructor">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Guardando...
+              </span>
+              <span v-else>
+                <i class="bi bi-check-circle me-2"></i>
+                Guardar
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -472,5 +723,54 @@ const resumenHorario = computed(() => {
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
+}
+
+/* ✅ Estilos para la card de instructor */
+.instructor-avatar {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #81045f 0%, #4a90e2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.instructor-info {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  border-left: 4px solid var(--bs-primary);
+}
+
+/* ✅ Estilos del modal */
+.modal.show {
+  display: block;
+}
+
+.list-group-item.active {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: white;
+}
+
+.list-group-item:hover:not(.active) {
+  background-color: #f8f9fa;
+}
+
+.list-group-item.cursor-pointer {
+  cursor: pointer;
+}
+
+.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-outline-primary:hover {
+  color: white;
 }
 </style>

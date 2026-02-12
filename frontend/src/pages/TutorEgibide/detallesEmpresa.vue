@@ -17,10 +17,6 @@ const isLoading = ref(true);
 const error = ref<string | null>(null);
 const todosInstructores = ref<Instructor[]>([]);
 
-// Modal de asignar instructor
-const showAsignarModal = ref(false);
-const selectedInstructorId = ref<number | null>(null);
-
 const empresaId = Number(route.params.empresaId);
 
 onMounted(async () => {
@@ -54,37 +50,8 @@ const cargarTodosInstructores = async () => {
   todosInstructores.value = await instructorStore.obtenerPorEmpresa(empresaId);
 };
 
-// Abrir modal de asignación
-const abrirAsignarModal = () => {
-  selectedInstructorId.value = null;
-  showAsignarModal.value = true;
-};
 
-// Asignar o cambiar instructor
-const asignarInstructor = async () => {
-  if (!selectedInstructorId.value) return;
-  try {
-    const response = await fetch(
-      `${baseURL}/api/tutorEgibide/empresa/${empresaId}/asignar-instructor`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authStore.token ? `Bearer ${authStore.token}` : "",
-        },
-        body: JSON.stringify({ instructor_id: selectedInstructorId.value }),
-      }
-    );
-    if (!response.ok) throw new Error("Error al asignar el instructor");
 
-    await cargarDetalleEmpresa();
-    instructorStore.setMessage("Instructor asignado correctamente", "success");
-    showAsignarModal.value = false;
-  } catch (err) {
-    console.error(err);
-    instructorStore.setMessage("No se pudo asignar el instructor", "error");
-  }
-};
 
 const volver = () => router.back();
 </script>
@@ -185,9 +152,6 @@ const volver = () => router.back();
       <!-- Sección de instructores -->
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0"><i class="bi bi-person-badge-fill me-2"></i>Instructores</h4>
-        <button class="btn btn-primary" @click="abrirAsignarModal">
-          <i class="bi bi-person-plus-fill me-2"></i> Asignar/Cambiar Instructor
-        </button>
       </div>
 
       <!-- Lista de instructores actuales -->
@@ -207,32 +171,6 @@ const volver = () => router.back();
       </div>
       <div v-else class="alert alert-info">
         <i class="bi bi-info-circle-fill me-2"></i>No hay instructores asignados a esta empresa.
-      </div>
-
-      <!-- Modal de asignar instructor -->
-      <div v-if="showAsignarModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Asignar o cambiar instructor</h5>
-              <button type="button" class="btn-close" @click="showAsignarModal = false"></button>
-            </div>
-            <div class="modal-body">
-              <select v-model="selectedInstructorId" class="form-select">
-                <option value="" disabled>Selecciona un instructor</option>
-                <option v-for="inst in todosInstructores" :key="inst.id" :value="inst.id">
-                  {{ inst.nombre }} {{ inst.apellidos }}
-                </option>
-              </select>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-secondary" @click="showAsignarModal = false">Cancelar</button>
-              <button class="btn btn-primary" :disabled="!selectedInstructorId" @click="asignarInstructor">
-                Guardar
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
     </div>
