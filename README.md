@@ -1,3 +1,5 @@
+
+
 # 🎓 Dual Kudeatzailea · Egibide
 
 Aplicación web para la **gestión y seguimiento de la Formación Dual** en Egibide.  
@@ -22,6 +24,7 @@ La aplicación se encuentra desplegada y accesible en el siguiente entorno:
 
 Estas credenciales permiten probar las distintas funcionalidades según el **rol asignado**, simulando el uso real de la plataforma en el contexto de la Formación Dual.
 
+Depencedias requeridas para la importacion de csv: composer require phpoffice/phpspreadsheet
 ---
 
 ## 🖥️ Tecnologías utilizadas
@@ -67,9 +70,9 @@ El proyecto sigue la **identidad visual institucional de Egibide**, priorizando:
 
 ## 👥 Equipo de desarrollo
 
-- **Eneko**
-- **Danel**
-- **Iker**
+- **Aimar**
+- **Ibai**
+- **Bryan**
 
 ---
 
