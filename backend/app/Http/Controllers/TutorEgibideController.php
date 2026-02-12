@@ -304,4 +304,112 @@ class TutorEgibideController extends Controller
         $instructores = TutorEmpresa::all();
         return response()->json($instructores);
     }
+
+    /**
+ * Obtener instructor asignado a un alumno específico
+ */
+public function getInstructorByAlumno(Request $request, $alumnoId)
+{
+    try {
+        $alumno = Alumnos::with(['estancias.instructor.empresa'])
+            ->findOrFail($alumnoId);
+        
+        $estancia = $alumno->estancias->first();
+        
+        if (!$estancia || !$estancia->instructor_id) {
+            return response()->json([
+                'success' => true,
+                'instructor' => null,
+                'empresa_id' => $estancia->empresa_id ?? null
+            ], 200);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'instructor' => $estancia->instructor,
+            'empresa_id' => $estancia->empresa_id
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al obtener instructor: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+/**
+ * Obtener instructores disponibles de una empresa
+ */
+public function getInstructoresByEmpresa(Request $request, $empresaId)
+{
+    try {
+        $instructores = TutorEmpresa::where('empresa_id', $empresaId)->get();
+        
+        return response()->json([
+            'success' => true,
+            'instructores' => $instructores
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al obtener instructores: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+/**
+ * Asignar o cambiar instructor a un alumno
+ */
+public function asignarCambiarInstructor(Request $request)
+{
+    $validated = $request->validate([
+        'alumno_id' => 'required|exists:alumnos,id',
+        'instructor_id' => 'required|exists:instructores,id'
+    ]);
+
+    try {
+        DB::beginTransaction();
+
+        // Obtener la estancia del alumno
+        $estancia = Estancia::where('alumno_id', $validated['alumno_id'])->first();
+        
+        if (!$estancia) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'El alumno no tiene una estancia asignada'
+            ], 404);
+        }
+
+        // Verificar que el instructor pertenece a la empresa de la estancia
+        $instructor = TutorEmpresa::find($validated['instructor_id']);
+        
+        if ($instructor->empresa_id !== $estancia->empresa_id) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'El instructor no pertenece a la empresa asignada al alumno'
+            ], 422);
+        }
+
+        // Actualizar el instructor
+        $estancia->instructor_id = $validated['instructor_id'];
+        $estancia->save();
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Instructor asignado correctamente',
+            'instructor' => $instructor
+        ], 200);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al asignar instructor: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
 }
