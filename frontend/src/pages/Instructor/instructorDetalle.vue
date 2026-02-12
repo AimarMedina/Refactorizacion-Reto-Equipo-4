@@ -89,9 +89,6 @@ onMounted(() => {
     <div v-else-if="instructor" class="card">
       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h4 class="mb-0">Detalles del Instructor</h4>
-        <button class="btn btn-sm btn-light" @click="volver">
-          ← Volver
-        </button>
       </div>
 
       <div class="card-body">

@@ -63,7 +63,6 @@ const abrirAsignarModal = () => {
 // Asignar o cambiar instructor
 const asignarInstructor = async () => {
   if (!selectedInstructorId.value) return;
-
   try {
     const response = await fetch(
       `${baseURL}/api/tutorEgibide/empresa/${empresaId}/asignar-instructor`,

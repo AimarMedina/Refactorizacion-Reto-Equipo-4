@@ -15,7 +15,6 @@ use App\Models\EntregaCuaderno;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\TutorEmpresa;
 
 class TutorEgibideController extends Controller
 {
@@ -295,7 +294,7 @@ class TutorEgibideController extends Controller
             ], 500);
         }
     }
-    
+
 
 
 

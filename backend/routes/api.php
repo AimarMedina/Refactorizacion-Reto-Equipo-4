@@ -37,12 +37,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // ========================================
 
     Route::middleware('can:is-admin')->group(function () {
-        
+
         // --- ESTAS SON LAS RUTAS QUE TE FALTABAN ---
         Route::get('/admin/inicio', [AdminController::class, 'inicioAdmin']);
         Route::get('/admin/alumnos/{id}', [AdminController::class, 'detalleAlumno']);
         Route::get('/admin/empresas/{empresaId}', [AdminController::class, 'detalleEmpresa']);
-        
+
         Route::post('/importar-alumnos', [ImportacionController::class, 'upload']);
         Route::post('/importar-asignaciones', [ImportacionController::class, 'uploadAsignaciones']);
         // -------------------------------------------
@@ -201,8 +201,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/instructores/{id}', [InstructorController::class, 'show']);
         Route::put('/instructores/{id}', [InstructorController::class, 'update']);
         Route::delete('/instructores/{id}', [InstructorController::class, 'destroy']);
-       
-    }
     });
 
     // ========================================
