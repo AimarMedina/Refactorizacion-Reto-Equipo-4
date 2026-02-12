@@ -38,7 +38,6 @@ Route::middleware('auth:sanctum')->group(
         Route::post('/ciclos', [CiclosController::class, 'store']);
         Route::post('/ciclos/importar', [CiclosController::class, 'importarCSV']);
         Route::get('/ciclos/plantilla', [CiclosController::class, 'descargarPlantillaCSV']);
-        Route::get('/ciclo/{ciclo_id}/cursos', [CiclosController::class, 'getCursosByCiclos']);
         Route::get('/ciclo/{ciclo_id}/tutores', [TutorEgibideController::class, 'getTutoresByCiclo']);
         Route::get('/ciclo/{ciclo_id}/asignaturas', [CiclosController::class, 'getAsignaturasByCiclo']);
 
