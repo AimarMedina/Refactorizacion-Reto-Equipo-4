@@ -4,11 +4,12 @@ return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
     'allowed_methods' => ['*'],
     'allowed_origins' => [
+        'http://172.20.228.22',
         'http://localhost:5173',
-        'http://172.20.228.41',
-        'http://172.20.228.41:8000',
     ],
+    'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
+    'exposed_headers' => [],
+    'max_age' => 0,
     'supports_credentials' => true,
 ];
-
