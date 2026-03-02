@@ -156,8 +156,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN', null),
-'same_site' => 'lax',
+    'domain' => env('SESSION_DOMAIN'),
 
     /*
     |--------------------------------------------------------------------------
