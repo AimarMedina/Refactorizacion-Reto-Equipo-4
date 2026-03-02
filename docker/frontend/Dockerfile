@@ -18,7 +18,7 @@ COPY . ./
 ENV VITE_API_BASE_URL=""
 
 # Build para producción
-RUN npm run build
+RUN npm run build-only
 
 # Etapa 2: Servidor Nginx
 FROM nginx:alpine
