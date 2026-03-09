@@ -3,37 +3,20 @@ FROM php:8.4-cli
 WORKDIR /var/www/html
 
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    zip \
-    unzip \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+    git unzip libzip-dev libpng-dev libpq-dev
 
 RUN docker-php-ext-install \
     pdo \
-    pdo_mysql \
     pdo_pgsql \
     pgsql \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    zip
+    zip \
+    gd
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-COPY ./backend /var/www/html
+COPY . .
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 storage bootstrap/cache
+RUN composer install --no-dev --optimize-autoloader
 
 EXPOSE 8080
 
