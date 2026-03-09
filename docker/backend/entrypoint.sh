@@ -1,5 +1,4 @@
 #!/bin/sh
-
 set -e
 
 echo "Esperando a PostgreSQL..."
@@ -25,5 +24,4 @@ php artisan config:cache
 php artisan route:cache
 
 echo "Iniciando servidor Laravel..."
-
 exec php artisan serve --host=0.0.0.0 --port=$PORT
