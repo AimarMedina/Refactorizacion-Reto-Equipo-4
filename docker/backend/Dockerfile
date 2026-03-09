@@ -14,10 +14,11 @@ RUN docker-php-ext-install \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-COPY . .
+COPY . /var/www/html
 
 RUN composer install --no-dev --optimize-autoloader
 
-EXPOSE 8080
+COPY docker/backend/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-CMD php artisan serve --host=0.0.0.0 --port=$PORT
+ENTRYPOINT ["/entrypoint.sh"]
