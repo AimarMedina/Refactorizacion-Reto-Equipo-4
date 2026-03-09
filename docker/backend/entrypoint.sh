@@ -2,24 +2,28 @@
 
 set -e
 
-# Esperar a que la base de datos esté lista
-echo "Esperando a MySQL..."
-until php -r "new PDO('mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));" 2>/dev/null; do
+echo "Esperando a PostgreSQL..."
+
+until php -r "new PDO('pgsql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));" 2>/dev/null; do
   echo -n "."
-  sleep 1
+  sleep 2
 done
 
-echo "MySQL listo"
+echo "PostgreSQL listo"
 
-# Generar APP_KEY si no existe
+# Crear .env si no existe
 if [ ! -f /var/www/html/.env ]; then
     cp /var/www/html/.env.example /var/www/html/.env
 fi
 
 php artisan key:generate --force
+
 php artisan migrate --force --seed
+
 php artisan config:clear
 php artisan config:cache
 php artisan route:cache
 
-exec php-fpm
+echo "Iniciando servidor Laravel..."
+
+exec php artisan serve --host=0.0.0.0 --port=$PORT
