@@ -3,13 +3,18 @@ set -e
 
 echo "Esperando a MySQL..."
 
-# Cambiamos pgsql por mysql en el PDO
 until php -r "new PDO('mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));" 2>/dev/null; do
   echo -n "."
   sleep 2
 done
 
 echo "MySQL listo"
+
+echo "Creando base de datos si no existe..."
+php -r "
+\$pdo = new PDO('mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+\$pdo->exec('CREATE DATABASE IF NOT EXISTS ' . getenv('DB_DATABASE'));
+"
 
 # Crear .env si no existe
 if [ ! -f /var/www/html/.env ]; then
@@ -18,7 +23,8 @@ fi
 
 php artisan key:generate --force
 
-php artisan migrate --force --seed
+# Borra tablas y vuelve a migrar
+php artisan migrate:fresh --force --seed
 
 php artisan config:clear
 php artisan config:cache
